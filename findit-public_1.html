@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FindIt — Campus Lost & Found</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0F1B2D;
+      --navy-mid: #1E3A5F;
+      --amber: #F59E0B;
+      --amber-light: #FEF3C7;
+      --amber-dark: #B45309;
+      --cream: #FAFAF7;
+      --white: #FFFFFF;
+      --slate: #64748B;
+      --slate-light: #F1F5F9;
+      --line: #E2E8F0;
+      --red: #EF4444;
+      --green: #10B981;
+      --green-light: #D1FAE5;
+      --red-light: #FEE2E2;
+      --blue: #3B82F6;
+      --blue-light: #DBEAFE;
+      --purple: #8B5CF6;
+      --purple-light: #EDE9FE;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--cream);
+      color: var(--navy);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    .topnav {
+      background: var(--navy);
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+    .brand-icon {
+      width: 32px; height: 32px;
+      background: var(--amber);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .brand-name { color: var(--white); font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; }
+    .brand-sub { color: var(--amber); font-size: 0.65rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
+    .nav-actions { display: flex; gap: 0.75rem; align-items: center; }
+    .nav-btn {
+      padding: 0.4rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600;
+      border: 1.5px solid rgba(255,255,255,0.25); color: var(--white); background: transparent;
+      cursor: pointer; transition: all 0.15s;
+      text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.08); }
+    .nav-btn.primary { background: var(--amber); border-color: var(--amber); color: var(--navy); }
+    .nav-btn.primary:hover { background: #FBBF24; }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      padding: 4rem 1.5rem 3rem;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.35);
+      color: var(--amber);
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.3rem 0.9rem; border-radius: 999px; margin-bottom: 1.25rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800; color: var(--white); letter-spacing: -0.03em; line-height: 1.15;
+      max-width: 640px; margin: 0 auto 1rem;
+    }
+    .hero h1 span { color: var(--amber); }
+    .hero p {
+      color: rgba(255,255,255,0.65); font-size: 1rem; max-width: 500px; margin: 0 auto 2rem;
+    }
+    .hero-ctas { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    .cta-btn {
+      padding: 0.75rem 1.75rem; border-radius: 10px; font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; border: none; transition: all 0.18s; display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+    .cta-btn.amber { background: var(--amber); color: var(--navy); }
+    .cta-btn.amber:hover { background: #FBBF24; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(245,158,11,0.35); }
+    .cta-btn.outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.3); color: var(--white); }
+    .cta-btn.outline:hover { background: rgba(255,255,255,0.08); }
+
+    /* STATS BAR */
+    .stats-bar {
+      background: var(--white); border-bottom: 1px solid var(--line);
+      padding: 1rem 1.5rem;
+      display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 1.5rem; font-weight: 800; color: var(--navy); letter-spacing: -0.03em; }
+    .stat-label { font-size: 0.7rem; color: var(--slate); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; }
+
+    /* MAIN LAYOUT */
+    .main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* TABS */
+    .tabs {
+      display: flex; gap: 0.375rem; background: var(--white); border: 1px solid var(--line);
+      border-radius: 12px; padding: 0.3rem; margin-bottom: 1.5rem; overflow-x: auto;
+    }
+    .tab-btn {
+      flex: 1; padding: 0.6rem 1rem; border: none; border-radius: 8px;
+      font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+      background: transparent; color: var(--slate); transition: all 0.15s;
+    }
+    .tab-btn.active { background: var(--navy); color: var(--white); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* CARDS GRID */
+    .cards-grid {
+      display: grid; gap: 1.25rem;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+    .item-card {
+      background: var(--white); border: 1px solid var(--line); border-radius: 16px;
+      overflow: hidden; transition: box-shadow 0.18s, transform 0.18s;
+      cursor: pointer;
+    }
+    .item-card:hover { box-shadow: 0 8px 32px rgba(15,27,45,0.1); transform: translateY(-2px); }
+    .card-img {
+      width: 100%; height: 190px; object-fit: cover; background: var(--slate-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; position: relative; flex-shrink: 0;
+    }
+    .card-img-placeholder {
+      width: 100%; height: 190px; background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%);
+      display: flex; align-items: center; justify-content: center; font-size: 3rem;
+      position: relative;
+    }
+    .card-img-real {
+      width: 100%; height: 190px; object-fit: cover; display: block;
+    }
+    .card-img-overlay {
+      position: absolute; top: 0.6rem; left: 0.6rem; right: 0.6rem;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .status-badge {
+      padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .status-lost { background: var(--red); color: #fff; }
+    .status-found { background: var(--green); color: #fff; }
+    .status-claimed { background: var(--slate); color: #fff; }
+    .status-resolved { background: var(--navy); color: #fff; }
+    .tag-pills { display: flex; flex-wrap: wrap; gap: 0.25rem; max-width: 55%; justify-content: flex-end; }
+    .tag-pill {
+      padding: 0.2rem 0.45rem; border-radius: 6px; font-size: 0.6rem; font-weight: 600;
+      background: rgba(15,27,45,0.75); color: rgba(255,255,255,0.9); backdrop-filter: blur(4px);
+    }
+    .card-body { padding: 1rem 1.1rem 1.2rem; }
+    .card-category {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--amber-dark); margin-bottom: 0.3rem;
+    }
+    .card-title { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 0.4rem; line-height: 1.3; }
+    .card-desc { font-size: 0.82rem; color: var(--slate); margin-bottom: 0.75rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: var(--slate); }
+    .card-location { display: flex; align-items: center; gap: 0.25rem; }
+    .card-action-btn {
+      padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600;
+      border: 1.5px solid var(--navy); background: transparent; color: var(--navy);
+      cursor: pointer; margin-top: 0.75rem; width: 100%; transition: all 0.15s;
+    }
+    .card-action-btn:hover { background: var(--navy); color: var(--white); }
+    .card-action-btn.amber { background: var(--amber); border-color: var(--amber); color: var(--navy); }
+    .card-action-btn.amber:hover { background: #FBBF24; }
+
+    /* FILTERS */
+    .filters-bar {
+      display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem;
+      align-items: center;
+    }
+    .filter-select, .filter-input {
+      padding: 0.5rem 0.9rem; border: 1.5px solid var(--line); border-radius: 10px;
+      font-size: 0.82rem; background: var(--white); color: var(--navy);
+      outline: none; transition: border-color 0.15s;
+    }
+    .filter-select:focus, .filter-input:focus { border-color: var(--amber); }
+    .filter-input { flex: 1; min-width: 200px; }
+    .filter-chip {
+      padding: 0.4rem 0.85rem; border-radius: 999px; border: 1.5px solid var(--line);
+      font-size: 0.75rem; font-weight: 600; cursor: pointer; background: var(--white); color: var(--slate);
+      transition: all 0.15s;
+    }
+    .filter-chip.active-lost { background: var(--red-light); border-color: var(--red); color: var(--red); }
+    .filter-chip.active-found { background: var(--green-light); border-color: var(--green); color: #059669; }
+    .filter-chip.active-all { background: var(--navy); border-color: var(--navy); color: var(--white); }
+
+    /* FORM */
+    .form-card {
+      background: var(--white); border: 1px solid var(--line); border-radius: 16px; padding: 2rem;
+    }
+    .form-section-title {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--amber-dark); margin-bottom: 1rem; padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .form-grid { display: grid; gap: 1rem; margin-bottom: 1.25rem; }
+    .form-grid.two { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 640px) { .form-grid.two { grid-template-columns: 1fr; } }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .form-label { font-size: 0.8rem; font-weight: 600; color: var(--navy); }
+    .form-label span { color: var(--red); margin-left: 0.1rem; }
+    .form-control {
+      padding: 0.6rem 0.9rem; border: 1.5px solid var(--line); border-radius: 10px;
+      font-size: 0.88rem; background: var(--white); color: var(--navy);
+      outline: none; transition: border-color 0.15s; font-family: inherit;
+      width: 100%;
+    }
+    .form-control:focus { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
+    textarea.form-control { resize: vertical; min-height: 100px; }
+
+    /* IMAGE UPLOAD */
+    .image-upload-zone {
+      border: 2px dashed var(--line); border-radius: 12px; padding: 2rem;
+      text-align: center; cursor: pointer; transition: all 0.15s; background: var(--cream);
+    }
+    .image-upload-zone:hover { border-color: var(--amber); background: var(--amber-light); }
+    .image-upload-zone input[type=file] { display: none; }
+    .upload-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .upload-text { font-size: 0.85rem; color: var(--slate); }
+    .upload-text strong { color: var(--amber-dark); }
+    .preview-imgs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+    .preview-img-wrap { position: relative; }
+    .preview-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid var(--line); }
+    .preview-remove {
+      position: absolute; top: -6px; right: -6px; width: 18px; height: 18px;
+      background: var(--red); color: white; border-radius: 50%; border: none;
+      font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* TAG INPUT */
+    .tag-input-wrap {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0.5rem 0.7rem;
+      border: 1.5px solid var(--line); border-radius: 10px; background: var(--white);
+      min-height: 44px; cursor: text; transition: border-color 0.15s;
+    }
+    .tag-input-wrap:focus-within { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
+    .tag-chip-input {
+      display: flex; align-items: center; gap: 0.25rem;
+      background: var(--amber-light); border: 1px solid #FDE68A; border-radius: 6px;
+      padding: 0.15rem 0.4rem; font-size: 0.75rem; font-weight: 600; color: var(--amber-dark);
+    }
+    .tag-chip-remove { background: none; border: none; cursor: pointer; color: var(--amber-dark); font-size: 12px; line-height: 1; padding: 0; }
+    .tag-text-input {
+      border: none; outline: none; font-size: 0.82rem; background: transparent;
+      color: var(--navy); flex: 1; min-width: 120px;
+    }
+    .tag-suggestions {
+      display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.4rem;
+    }
+    .tag-suggest-btn {
+      padding: 0.2rem 0.55rem; border: 1px solid var(--line); border-radius: 6px;
+      font-size: 0.72rem; background: var(--cream); color: var(--slate); cursor: pointer;
+      transition: all 0.12s;
+    }
+    .tag-suggest-btn:hover { border-color: var(--amber); color: var(--amber-dark); background: var(--amber-light); }
+
+    /* SUBMIT BTN */
+    .submit-btn {
+      width: 100%; padding: 0.85rem; border-radius: 12px; border: none;
+      background: var(--navy); color: var(--white); font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; transition: all 0.18s; margin-top: 0.5rem;
+    }
+    .submit-btn:hover { background: var(--navy-mid); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(15,27,45,0.2); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,27,45,0.6); z-index: 200;
+      display: flex; align-items: center; justify-content: center; padding: 1rem;
+      backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--white); border-radius: 20px; padding: 2rem; max-width: 560px; width: 100%;
+      max-height: 90vh; overflow-y: auto; transform: scale(0.96); transition: transform 0.2s;
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; }
+    .modal-title { font-size: 1.2rem; font-weight: 700; color: var(--navy); }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line);
+      background: transparent; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-img { width: 100%; border-radius: 12px; object-fit: cover; max-height: 260px; background: var(--slate-light); display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem; }
+    .detail-row { display: flex; gap: 0.75rem; margin-bottom: 0.6rem; font-size: 0.85rem; }
+    .detail-key { font-weight: 600; color: var(--navy); min-width: 90px; }
+    .detail-val { color: var(--slate); }
+    .modal-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
+    .modal-tag { padding: 0.2rem 0.5rem; background: var(--amber-light); border: 1px solid #FDE68A; border-radius: 6px; font-size: 0.72rem; font-weight: 600; color: var(--amber-dark); }
+    .claim-area { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--line); }
+    .claim-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--navy); }
+    .claim-input { width: 100%; padding: 0.6rem 0.9rem; border: 1.5px solid var(--line); border-radius: 10px; font-size: 0.85rem; margin-bottom: 0.5rem; font-family: inherit; outline: none; }
+    .claim-input:focus { border-color: var(--amber); }
+    .claim-btn {
+      width: 100%; padding: 0.7rem; border: none; border-radius: 10px;
+      background: var(--amber); color: var(--navy); font-weight: 700; font-size: 0.88rem;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .claim-btn:hover { background: #FBBF24; }
+    .admin-response-box {
+      background: var(--slate-light); border-radius: 10px; padding: 0.75rem 1rem; margin-top: 0.75rem;
+      border-left: 3px solid var(--navy);
+    }
+    .admin-resp-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--slate); margin-bottom: 0.25rem; }
+    .admin-resp-text { font-size: 0.85rem; color: var(--navy); }
+
+    /* IF FOUND CONTACT */
+    .if-found-btn {
+      width: 100%; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700;
+      border: 1.5px solid var(--green); background: var(--green-light); color: #059669;
+      cursor: pointer; margin-top: 0.5rem; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+    }
+    .if-found-btn:hover { background: var(--green); color: #fff; }
+
+    /* FINDER LEAD MODAL */
+    .finder-modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,27,45,0.65); z-index: 300;
+      display: flex; align-items: center; justify-content: center; padding: 1rem;
+      backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .finder-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .finder-modal {
+      background: var(--white); border-radius: 20px; padding: 2rem; max-width: 500px; width: 100%;
+      max-height: 90vh; overflow-y: auto; transform: scale(0.96); transition: transform 0.2s;
+    }
+    .finder-modal-overlay.open .finder-modal { transform: scale(1); }
+    .finder-modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; }
+    .finder-modal-title { font-size: 1.15rem; font-weight: 800; color: var(--navy); }
+    .finder-modal-sub { font-size: 0.8rem; color: var(--slate); margin-top: 0.25rem; }
+    .finder-info-banner {
+      background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+      border: 1px solid #6EE7B7; border-radius: 10px; padding: 0.85rem 1rem;
+      margin-bottom: 1.25rem; font-size: 0.8rem; color: #065F46; line-height: 1.5;
+    }
+    .finder-info-banner strong { display: block; font-size: 0.83rem; margin-bottom: 0.25rem; }
+    .finder-field-label { font-size: 0.78rem; font-weight: 700; color: var(--navy); margin-bottom: 0.3rem; display: block; }
+    .finder-field-label span { color: var(--red); }
+    .finder-input {
+      width: 100%; padding: 0.6rem 0.9rem; border: 1.5px solid var(--line); border-radius: 10px;
+      font-size: 0.88rem; background: var(--white); color: var(--navy); outline: none;
+      font-family: inherit; margin-bottom: 0.85rem; transition: border-color 0.15s;
+    }
+    .finder-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(16,185,129,0.12); }
+    textarea.finder-input { resize: vertical; min-height: 90px; margin-bottom: 0; }
+    .finder-submit-btn {
+      width: 100%; padding: 0.8rem; border-radius: 10px; border: none;
+      background: var(--green); color: #fff; font-size: 0.92rem; font-weight: 700;
+      cursor: pointer; transition: all 0.15s; margin-top: 1rem;
+    }
+    .finder-submit-btn:hover { background: #059669; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,185,129,0.35); }
+    .finder-submitted-state { text-align: center; padding: 1.5rem 0; }
+    .finder-submitted-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+    .finder-submitted-title { font-size: 1.1rem; font-weight: 800; color: var(--navy); margin-bottom: 0.5rem; }
+    .finder-submitted-sub { font-size: 0.85rem; color: var(--slate); line-height: 1.6; }
+
+    /* TOAST */
+    #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 300; display: flex; flex-direction: column; gap: 0.5rem; }
+    .toast {
+      padding: 0.75rem 1.1rem; border-radius: 10px; font-size: 0.83rem; font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15); max-width: 320px;
+      animation: slideIn 0.2s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .toast-success { background: var(--navy); color: var(--white); }
+    .toast-error { background: var(--red); color: var(--white); }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 4rem 1rem; }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .empty-title { font-size: 1.1rem; font-weight: 700; color: var(--navy); margin-bottom: 0.4rem; }
+    .empty-desc { font-size: 0.85rem; color: var(--slate); }
+
+    /* ANNOUNCEMENTS */
+    .announcement-card {
+      background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.25rem;
+      border-left: 4px solid var(--amber); margin-bottom: 0.75rem;
+    }
+    .ann-title { font-weight: 700; font-size: 0.95rem; color: var(--navy); margin-bottom: 0.25rem; }
+    .ann-msg { font-size: 0.83rem; color: var(--slate); }
+    .ann-time { font-size: 0.7rem; color: var(--slate); margin-top: 0.4rem; }
+    .ann-badge { display: inline-block; padding: 0.15rem 0.45rem; border-radius: 6px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; background: var(--amber-light); color: var(--amber-dark); margin-right: 0.4rem; }
+
+    /* MY ITEMS */
+    .my-item-row {
+      background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.25rem;
+      display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 0.75rem;
+    }
+    .my-item-icon { font-size: 2rem; flex-shrink: 0; }
+    .my-item-info { flex: 1; }
+    .my-item-name { font-weight: 700; font-size: 0.95rem; color: var(--navy); }
+    .my-item-desc { font-size: 0.82rem; color: var(--slate); margin-top: 0.2rem; }
+    .my-item-status { font-size: 0.72rem; margin-top: 0.4rem; display: flex; align-items: center; gap: 0.4rem; }
+
+    /* SECTION HEADER */
+    .section-head { margin-bottom: 1.25rem; }
+    .section-eyebrow { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--amber-dark); margin-bottom: 0.3rem; }
+    .section-title { font-size: 1.5rem; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; }
+    .section-sub { font-size: 0.85rem; color: var(--slate); margin-top: 0.35rem; }
+
+    .info-pill {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: var(--blue-light); color: #1E40AF; padding: 0.5rem 1rem;
+      border-radius: 10px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1.25rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .hero { padding: 2.5rem 1rem 2rem; }
+      .stats-bar { gap: 1.5rem; }
+      .topnav { padding: 0 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="topnav">
+    <a class="brand" href="#">
+      <div class="brand-icon">🔍</div>
+      <div>
+        <div class="brand-name">FindIt</div>
+        <div class="brand-sub">Lost & Found</div>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <a href="findit-admin.html" class="nav-btn">Admin Portal</a>
+      <button class="nav-btn primary" onclick="setTab('report')">+ Report Item</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Campus Lost & Found Repository</div>
+    <h1>Reuniting <span>people</span> with what matters</h1>
+    <p>Browse lost and found items, submit a report, and get notified when your item is located.</p>
+    <div class="hero-ctas">
+      <button class="cta-btn amber" onclick="setTab('lost')">🔴 View Lost Items</button>
+      <button class="cta-btn outline" onclick="setTab('found')">🟢 View Found Items</button>
+    </div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-num" id="stat-lost">0</div>
+      <div class="stat-label">Items Lost</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="stat-found">0</div>
+      <div class="stat-label">Items Found</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="stat-resolved">0</div>
+      <div class="stat-label">Reunited</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="stat-total">0</div>
+      <div class="stat-label">Total Reports</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="lost" onclick="setTab('lost')">🔴 Lost Items</button>
+      <button class="tab-btn" data-tab="found" onclick="setTab('found')">🟢 Found Items</button>
+      <button class="tab-btn" data-tab="report" onclick="setTab('report')">📋 Report an Item</button>
+      <button class="tab-btn" data-tab="my-items" onclick="setTab('my-items')">📦 My Reports</button>
+      <button class="tab-btn" data-tab="notices" onclick="setTab('notices')">📢 Notices</button>
+    </div>
+
+    <!-- LOST ITEMS -->
+    <div class="tab-panel active" id="panel-lost">
+      <div class="section-head">
+        <div class="section-eyebrow">Lost Items</div>
+        <div class="section-title">Items reported missing</div>
+        <div class="section-sub">Browse items that students and staff have reported lost. See something familiar? Contact the owner.</div>
+      </div>
+      <div class="filters-bar">
+        <input class="filter-input" id="search-lost" placeholder="Search by name, tag, location…" oninput="renderBrowse('lost')">
+        <select class="filter-select" id="cat-lost" onchange="renderBrowse('lost')">
+          <option value="">All categories</option>
+        </select>
+        <select class="filter-select" id="loc-lost" onchange="renderBrowse('lost')">
+          <option value="">All locations</option>
+        </select>
+      </div>
+      <div class="cards-grid" id="grid-lost"></div>
+    </div>
+
+    <!-- FOUND ITEMS -->
+    <div class="tab-panel" id="panel-found">
+      <div class="section-head">
+        <div class="section-eyebrow">Found Items</div>
+        <div class="section-title">Items waiting to be claimed</div>
+        <div class="section-sub">These items have been turned in. If one is yours, click it to submit a claim.</div>
+      </div>
+      <div class="filters-bar">
+        <input class="filter-input" id="search-found" placeholder="Search by name, tag, location…" oninput="renderBrowse('found')">
+        <select class="filter-select" id="cat-found" onchange="renderBrowse('found')">
+          <option value="">All categories</option>
+        </select>
+        <select class="filter-select" id="loc-found" onchange="renderBrowse('found')">
+          <option value="">All locations</option>
+        </select>
+      </div>
+      <div class="cards-grid" id="grid-found"></div>
+    </div>
+
+    <!-- REPORT FORM -->
+    <div class="tab-panel" id="panel-report">
+      <div class="section-head">
+        <div class="section-eyebrow">Submit a Report</div>
+        <div class="section-title">Tell us about an item</div>
+        <div class="section-sub">Fill in as much detail as possible. Add image tags to help others identify the item.</div>
+      </div>
+      <div class="info-pill">ℹ️ Reports are reviewed by administrators before being published to the board.</div>
+      <div class="form-card">
+        <div class="form-section-title">Report Type & Item Details</div>
+        <div class="form-grid two">
+          <div class="form-group">
+            <label class="form-label">Report type <span>*</span></label>
+            <select class="form-control" id="f-type">
+              <option value="lost">I lost something</option>
+              <option value="found">I found something</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category <span>*</span></label>
+            <select class="form-control" id="f-category">
+              <option value="">Select category…</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Item name <span>*</span></label>
+            <input class="form-control" id="f-name" placeholder="e.g. Black Samsung A53" type="text">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location <span>*</span></label>
+            <select class="form-control" id="f-location">
+              <option value="">Select location…</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column: 1/-1">
+            <label class="form-label">Description <span>*</span></label>
+            <textarea class="form-control" id="f-description" placeholder="Describe the item in detail — color, brand, distinguishing marks, condition, etc."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date lost/found <span>*</span></label>
+            <input class="form-control" id="f-date" type="date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Time (approx.)</label>
+            <input class="form-control" id="f-time" type="time">
+          </div>
+        </div>
+
+        <div class="form-section-title">Image Tags</div>
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label class="form-label">Add descriptive tags</label>
+          <div class="tag-input-wrap" id="tag-input-wrap" onclick="document.getElementById('tag-text').focus()">
+            <input class="tag-text-input" id="tag-text" placeholder="Type a tag and press Enter…" onkeydown="handleTagKey(event)">
+          </div>
+          <div class="tag-suggestions" id="tag-suggestions"></div>
+        </div>
+
+        <div class="form-section-title">Your Contact</div>
+        <div class="form-grid two">
+          <div class="form-group">
+            <label class="form-label">Your name <span>*</span></label>
+            <input class="form-control" id="f-reporter-name" type="text" placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact (phone/email) <span>*</span></label>
+            <input class="form-control" id="f-contact" type="text" placeholder="08012345678 or you@example.com">
+          </div>
+        </div>
+
+        <div class="form-section-title">Upload Photos</div>
+        <div class="image-upload-zone" onclick="document.getElementById('img-upload').click()">
+          <input type="file" id="img-upload" accept="image/*" multiple onchange="handleImgUpload(this)">
+          <div class="upload-icon">📷</div>
+          <div class="upload-text"><strong>Click to upload</strong> or drag and drop<br>PNG, JPG up to 5MB each</div>
+        </div>
+        <div class="preview-imgs" id="preview-imgs"></div>
+
+        <button class="submit-btn" id="submit-btn" onclick="submitReport()">Submit Report</button>
+      </div>
+    </div>
+
+    <!-- MY ITEMS -->
+    <div class="tab-panel" id="panel-my-items">
+      <div class="section-head">
+        <div class="section-eyebrow">My Reports</div>
+        <div class="section-title">Items you've submitted</div>
+        <div class="section-sub">Track the status of your lost/found reports and view admin responses.</div>
+      </div>
+      <div class="filters-bar">
+        <input class="filter-input" id="my-name-filter" placeholder="Filter by your name…" oninput="renderMyItems()">
+      </div>
+      <div id="my-items-list"></div>
+    </div>
+
+    <!-- NOTICES -->
+    <div class="tab-panel" id="panel-notices">
+      <div class="section-head">
+        <div class="section-eyebrow">Notices & Announcements</div>
+        <div class="section-title">Updates from the Lost & Found desk</div>
+        <div class="section-sub">Important announcements from administrators about recovered items and procedures.</div>
+      </div>
+      <div id="notices-list"></div>
+    </div>
+  </main>
+
+  <!-- ITEM DETAIL MODAL -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" id="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title"></div>
+        <button class="modal-close" onclick="closeModalDirect()">✕</button>
+      </div>
+      <div id="modal-img-wrap"></div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast-container"></div>
+
+<!-- FINDER LEAD MODAL -->
+<div class="finder-modal-overlay" id="finder-modal-overlay" onclick="closeFinderModal(event)">
+  <div class="finder-modal">
+    <div class="finder-modal-header">
+      <div>
+        <div class="finder-modal-title">📣 I Found This Item</div>
+        <div class="finder-modal-sub" id="finder-item-ref" style="color:var(--amber-dark);font-weight:600;font-size:0.8rem;margin-top:0.2rem"></div>
+      </div>
+      <button class="modal-close" onclick="closeFinderModal()">✕</button>
+    </div>
+    <div id="finder-form-area">
+      <div class="finder-info-banner">
+        <strong>🛡️ Fraud-protected process</strong>
+        Your contact details will be sent to our admin team, who will first interview you to verify your lead. Only after confirmation will the item owner be notified — keeping both parties safe.
+      </div>
+      <label class="finder-field-label">Your full name <span>*</span></label>
+      <input class="finder-input" id="fl-name" placeholder="e.g. Adaeze Nwosu" type="text">
+      <label class="finder-field-label">Your contact (phone or email) <span>*</span></label>
+      <input class="finder-input" id="fl-contact" placeholder="e.g. 08012345678 or you@email.com" type="text">
+      <label class="finder-field-label">Where did you find it? <span>*</span></label>
+      <input class="finder-input" id="fl-where" placeholder="e.g. Under a desk in Lecture Hall B" type="text">
+      <label class="finder-field-label">Describe what you found / how you know it's this item <span>*</span></label>
+      <textarea class="finder-input" id="fl-details" placeholder="Include any details that help confirm the match — colour, brand, condition, contents, etc."></textarea>
+      <button class="finder-submit-btn" onclick="submitFinderLead()">Submit Lead to Admin →</button>
+    </div>
+    <div id="finder-success-area" style="display:none">
+      <div class="finder-submitted-state">
+        <div class="finder-submitted-icon">✅</div>
+        <div class="finder-submitted-title">Lead submitted successfully!</div>
+        <div class="finder-submitted-sub">An admin will review your information and may contact you for a brief interview.<br><br>Once verified, the owner will be notified through us. Thank you for helping reunite this item!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== DATA =====================
+const STORAGE_KEY = 'findit-v1';
+const NOTICES_KEY = 'findit-notices-v1';
+
+const CATEGORIES = [
+  { id: 'electronics', label: 'Electronics', emoji: '📱' },
+  { id: 'clothing', label: 'Clothing & Accessories', emoji: '👗' },
+  { id: 'bags', label: 'Bags & Wallets', emoji: '👜' },
+  { id: 'books', label: 'Books & Stationery', emoji: '📚' },
+  { id: 'keys', label: 'Keys & Cards', emoji: '🔑' },
+  { id: 'jewelry', label: 'Jewelry', emoji: '💍' },
+  { id: 'documents', label: 'Documents & IDs', emoji: '🪪' },
+  { id: 'sports', label: 'Sports & Equipment', emoji: '⚽' },
+  { id: 'other', label: 'Other', emoji: '📦' },
+];
+
+const LOCATIONS = [
+  'Main Library', 'Lecture Hall A', 'Faculty of Science', 'Main Auditorium',
+  'Medical Centre', 'Student Union Building', 'Engineering Block',
+  'Management Sciences Block', 'Campus Cafeteria', 'Sports Complex',
+  'Administration Block', 'ICT Centre', 'Law Faculty', 'Social Sciences Block',
+  'Car Park A', 'Car Park B', 'Chapel / Mosque Grounds', 'Environmental Sciences Block',
+];
+
+const TAG_SUGGESTIONS = [
+  'black', 'brown', 'red', 'blue', 'silver', 'gold', 'white', 'green',
+  'cracked screen', 'branded', 'school ID', 'no cover', 'with strap', 'scratched',
+  'Samsung', 'Apple', 'HP', 'Dell', 'Lenovo', 'Nike', 'Adidas',
+  'broken zipper', 'name written', 'waterproof', 'glasses', 'charger', 'earbuds',
+];
+
+const SEED_ITEMS = [
+  {
+    id: 1, type: 'lost', category: 'electronics', name: 'Samsung Galaxy A54',
+    description: 'Black Samsung Galaxy A54 with a cracked screen protector. Found missing after BUS 214 class.',
+    location: 'Lecture Hall A', date: '2026-06-10', time: '13:00',
+    tags: ['black', 'Samsung', 'cracked screen'], images: [],
+    reporterName: 'Adebayo Ibrahim', contact: '08012345678',
+    status: 'active', adminResponse: '', broadcastd: false,
+    createdAt: '2026-06-10 13:25', id_pub: 'FI-001'
+  },
+  {
+    id: 2, type: 'found', category: 'keys', name: 'Bunch of keys with red tag',
+    description: 'Found a bunch of keys near the library entrance. Has a red lanyard tag.',
+    location: 'Main Library', date: '2026-06-11', time: '09:00',
+    tags: ['red', 'with strap'], images: [],
+    reporterName: 'Hassan Mariam', contact: 'hassan@student.lasu.edu.ng',
+    status: 'active', adminResponse: 'Item secured at the Lost & Found desk.', broadcast: true,
+    createdAt: '2026-06-11 09:40', id_pub: 'FI-002'
+  },
+  {
+    id: 3, type: 'lost', category: 'bags', name: 'Brown leather backpack',
+    description: 'Dark brown leather backpack, Zara brand. Contains notebooks and a blue pencil case.',
+    location: 'Faculty of Science', date: '2026-06-12', time: '11:00',
+    tags: ['brown', 'branded', 'broken zipper'], images: [],
+    reporterName: 'Olawale Precious', contact: '07098765432',
+    status: 'active', adminResponse: '', broadcast: false,
+    createdAt: '2026-06-12 11:55', id_pub: 'FI-003'
+  },
+  {
+    id: 4, type: 'found', category: 'documents', name: 'LASU Student ID Card',
+    description: 'Found a LASU ID card near the Engineering Block. Name on card is partially visible.',
+    location: 'Engineering Block', date: '2026-06-13', time: '15:30',
+    tags: ['school ID', 'name written'], images: [],
+    reporterName: 'Aisha Bello', contact: '09011223344',
+    status: 'claimed', adminResponse: 'Owner identified and item returned.', broadcast: false,
+    createdAt: '2026-06-13 16:00', id_pub: 'FI-004'
+  },
+  {
+    id: 5, type: 'lost', category: 'electronics', name: 'HP Laptop Charger',
+    description: '65W HP laptop charger, black, left in ICT Centre computer lab after evening session.',
+    location: 'ICT Centre', date: '2026-06-14', time: '18:00',
+    tags: ['HP', 'black', 'charger'], images: [],
+    reporterName: 'Emeka Okafor', contact: 'emeka@student.lasu.edu.ng',
+    status: 'resolved', adminResponse: 'Charger found and returned to owner.', broadcast: false,
+    createdAt: '2026-06-14 20:10', id_pub: 'FI-005'
+  },
+];
+
+const SEED_NOTICES = [
+  {
+    id: 1, title: 'Lost & Found desk location changed',
+    message: 'The Lost & Found desk has moved to the ground floor of the Administration Block. Operating hours: Mon–Fri, 8 AM – 4 PM.',
+    audience: 'all', createdAt: '2026-06-10 08:00', priority: 'high'
+  },
+  {
+    id: 2, title: 'Unclaimed items list — June 2026',
+    message: 'Several items submitted in May remain unclaimed. Please visit the Lost & Found desk before June 30 to claim them, or they will be donated.',
+    audience: 'all', createdAt: '2026-06-12 10:00', priority: 'normal'
+  },
+];
+
+// ===================== STATE =====================
+let state = { items: [], notices: [], tags: [] };
+let formTags = [];
+let previewFiles = [];
+let currentModal = null;
+
+function loadState() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    state.items = Array.isArray(raw.items) ? raw.items : SEED_ITEMS.map(i => ({...i}));
+    const noticeRaw = JSON.parse(localStorage.getItem(NOTICES_KEY) || '{}');
+    state.notices = Array.isArray(noticeRaw.notices) ? noticeRaw.notices : SEED_NOTICES.map(n => ({...n}));
+  } catch {
+    state.items = SEED_ITEMS.map(i => ({...i}));
+    state.notices = SEED_NOTICES.map(n => ({...n}));
+  }
+}
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: state.items }));
+  localStorage.setItem(NOTICES_KEY, JSON.stringify({ notices: state.notices }));
+}
+
+// ===================== UTILS =====================
+function getCat(id) { return CATEGORIES.find(c => c.id === id) || { label: id, emoji: '📦' }; }
+function fmt(d) { try { return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return d; } }
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+function getStatusLabel(item) {
+  if (item.status === 'claimed' || item.status === 'resolved') return item.status;
+  return item.type;
+}
+function statusClass(item) {
+  if (item.status === 'claimed') return 'status-claimed';
+  if (item.status === 'resolved') return 'status-resolved';
+  return item.type === 'lost' ? 'status-lost' : 'status-found';
+}
+function statusLabel(item) {
+  if (item.status === 'claimed') return 'Claimed';
+  if (item.status === 'resolved') return 'Resolved';
+  return item.type === 'lost' ? 'Lost' : 'Found';
+}
+
+// ===================== POPULATE SELECTS =====================
+function populateSelects() {
+  const catOpts = CATEGORIES.map(c => `<option value="${c.id}">${c.emoji} ${c.label}</option>`).join('');
+  const locOpts = LOCATIONS.map(l => `<option value="${l}">${l}</option>`).join('');
+  ['cat-lost','cat-found'].forEach(id => {
+    document.getElementById(id).innerHTML = `<option value="">All categories</option>${catOpts}`;
+  });
+  ['loc-lost','loc-found'].forEach(id => {
+    document.getElementById(id).innerHTML = `<option value="">All locations</option>${locOpts}`;
+  });
+  document.getElementById('f-category').innerHTML = `<option value="">Select category…</option>${catOpts}`;
+  document.getElementById('f-location').innerHTML = `<option value="">Select location…</option>${locOpts}`;
+  // Set today's date
+  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+  renderTagSuggestions();
+}
+
+// ===================== STATS =====================
+function updateStats() {
+  const items = state.items;
+  document.getElementById('stat-lost').textContent = items.filter(i => i.type === 'lost' && i.status === 'active').length;
+  document.getElementById('stat-found').textContent = items.filter(i => i.type === 'found' && i.status === 'active').length;
+  document.getElementById('stat-resolved').textContent = items.filter(i => i.status === 'resolved' || i.status === 'claimed').length;
+  document.getElementById('stat-total').textContent = items.length;
+}
+
+// ===================== BROWSE =====================
+function renderBrowse(type) {
+  const search = (document.getElementById(`search-${type}`)?.value || '').toLowerCase();
+  const cat = document.getElementById(`cat-${type}`)?.value || '';
+  const loc = document.getElementById(`loc-${type}`)?.value || '';
+
+  let items = state.items.filter(i => i.type === type);
+  if (cat) items = items.filter(i => i.category === cat);
+  if (loc) items = items.filter(i => i.location === loc);
+  if (search) items = items.filter(i =>
+    i.name.toLowerCase().includes(search) ||
+    i.description.toLowerCase().includes(search) ||
+    (i.tags || []).some(t => t.toLowerCase().includes(search)) ||
+    i.location.toLowerCase().includes(search)
+  );
+
+  const grid = document.getElementById(`grid-${type}`);
+  if (!items.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">${type === 'lost' ? '🔴' : '🟢'}</div><div class="empty-title">No ${type} items match your filters</div><div class="empty-desc">Try adjusting your search or filters.</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map(item => {
+    const cat = getCat(item.category);
+    const tagsHtml = (item.tags || []).slice(0,4).map(t => `<span class="tag-pill">${t}</span>`).join('');
+    const imgHtml = item.images && item.images[0]
+      ? `<img class="card-img-real" src="${item.images[0]}" alt="${item.name}">`
+      : `<div class="card-img-placeholder"><span>${cat.emoji}</span></div>`;
+    const actionBtn = item.type === 'found' && item.status === 'active'
+      ? `<button class="card-action-btn amber" onclick="openModal(${item.id})">This is mine — Claim</button>`
+      : item.type === 'lost' && item.status === 'active'
+      ? `<button class="card-action-btn" onclick="openModal(${item.id})" style="margin-bottom:0.4rem">View details</button>
+         <button class="if-found-btn" onclick="openFinderModal(${item.id})">📣 If Found, Contact Admin</button>`
+      : `<button class="card-action-btn" onclick="openModal(${item.id})">View details</button>`;
+    return `
+      <div class="item-card">
+        <div style="position:relative">
+          ${imgHtml}
+          <div class="card-img-overlay">
+            <span class="status-badge ${statusClass(item)}">${statusLabel(item)}</span>
+            <div class="tag-pills">${tagsHtml}</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-category">${cat.emoji} ${cat.label}</div>
+          <div class="card-title">${item.name}</div>
+          <div class="card-desc">${item.description}</div>
+          <div class="card-meta">
+            <span class="card-location">📍 ${item.location}</span>
+            <span>${item.id_pub || '#'+item.id}</span>
+          </div>
+          ${actionBtn}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ===================== MY ITEMS =====================
+function renderMyItems() {
+  const filter = (document.getElementById('my-name-filter')?.value || '').toLowerCase();
+  let items = state.items;
+  if (filter) items = items.filter(i => i.reporterName.toLowerCase().includes(filter));
+  
+  const list = document.getElementById('my-items-list');
+  if (!items.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title">No reports found</div><div class="empty-desc">Submit a report above, or search your name to find your items.</div></div>`;
+    return;
+  }
+  list.innerHTML = items.sort((a,b) => b.id - a.id).map(item => {
+    const cat = getCat(item.category);
+    const statusColor = item.status === 'resolved' || item.status === 'claimed' ? 'color:var(--green)' : item.type === 'lost' ? 'color:var(--red)' : 'color:var(--green)';
+    return `
+      <div class="my-item-row">
+        <div class="my-item-icon">${cat.emoji}</div>
+        <div class="my-item-info">
+          <div class="my-item-name">${item.name} <span style="font-size:0.7rem;color:var(--slate)">${item.id_pub || '#'+item.id}</span></div>
+          <div class="my-item-desc">${item.description.slice(0,100)}${item.description.length>100?'…':''}</div>
+          <div class="my-item-status">
+            <span class="status-badge ${statusClass(item)}">${statusLabel(item)}</span>
+            <span style="color:var(--slate)">📍 ${item.location} · ${fmt(item.date)}</span>
+          </div>
+          ${item.adminResponse ? `<div class="admin-response-box" style="margin-top:0.5rem"><div class="admin-resp-label">Admin Response</div><div class="admin-resp-text">${item.adminResponse}</div></div>` : ''}
+        </div>
+        <button class="card-action-btn" style="width:auto;flex-shrink:0" onclick="openModal(${item.id})">View</button>
+      </div>`;
+  }).join('');
+}
+
+// ===================== NOTICES =====================
+function renderNotices() {
+  const list = document.getElementById('notices-list');
+  const notices = state.notices;
+  if (!notices.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📢</div><div class="empty-title">No notices yet</div><div class="empty-desc">Check back later for updates from the admin desk.</div></div>`;
+    return;
+  }
+  list.innerHTML = notices.sort((a,b) => b.id - a.id).map(n => `
+    <div class="announcement-card">
+      <div class="ann-title"><span class="ann-badge">${n.priority === 'high' ? '🔔 Important' : 'Notice'}</span>${n.title}</div>
+      <div class="ann-msg">${n.message}</div>
+      <div class="ann-time">🕐 ${n.createdAt}</div>
+    </div>`).join('');
+}
+
+// ===================== TAGS =====================
+function renderTagSuggestions() {
+  const used = formTags.map(t => t.toLowerCase());
+  const suggestions = TAG_SUGGESTIONS.filter(t => !used.includes(t.toLowerCase())).slice(0, 14);
+  document.getElementById('tag-suggestions').innerHTML = suggestions.map(t =>
+    `<button class="tag-suggest-btn" onclick="addTag('${t}')">${t}</button>`
+  ).join('');
+}
+function addTag(tag) {
+  const clean = tag.trim().toLowerCase();
+  if (!clean || formTags.includes(clean)) return;
+  formTags.push(clean);
+  renderTagsInput();
+  document.getElementById('tag-text').value = '';
+  renderTagSuggestions();
+}
+function removeTag(tag) {
+  formTags = formTags.filter(t => t !== tag);
+  renderTagsInput();
+  renderTagSuggestions();
+}
+function renderTagsInput() {
+  const wrap = document.getElementById('tag-input-wrap');
+  const input = document.getElementById('tag-text');
+  wrap.querySelectorAll('.tag-chip-input').forEach(el => el.remove());
+  formTags.forEach(tag => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip-input';
+    chip.innerHTML = `${tag} <button class="tag-chip-remove" onclick="removeTag('${tag}')">×</button>`;
+    wrap.insertBefore(chip, input);
+  });
+}
+function handleTagKey(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    addTag(e.target.value);
+  }
+  if (e.key === 'Backspace' && !e.target.value && formTags.length) {
+    removeTag(formTags[formTags.length - 1]);
+  }
+}
+
+// ===================== IMAGE UPLOAD =====================
+function handleImgUpload(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    if (file.size > 5 * 1024 * 1024) { toast('Image too large (max 5MB)', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      previewFiles.push(e.target.result);
+      renderPreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function removePreview(idx) {
+  previewFiles.splice(idx, 1);
+  renderPreviews();
+}
+function renderPreviews() {
+  document.getElementById('preview-imgs').innerHTML = previewFiles.map((src, i) => `
+    <div class="preview-img-wrap">
+      <img class="preview-img" src="${src}" alt="preview ${i}">
+      <button class="preview-remove" onclick="removePreview(${i})">×</button>
+    </div>`).join('');
+}
+
+// ===================== SUBMIT =====================
+function submitReport() {
+  const type = document.getElementById('f-type').value;
+  const category = document.getElementById('f-category').value;
+  const name = document.getElementById('f-name').value.trim();
+  const location = document.getElementById('f-location').value;
+  const description = document.getElementById('f-description').value.trim();
+  const date = document.getElementById('f-date').value;
+  const time = document.getElementById('f-time').value;
+  const reporterName = document.getElementById('f-reporter-name').value.trim();
+  const contact = document.getElementById('f-contact').value.trim();
+
+  if (!category) { toast('Please select a category', 'error'); return; }
+  if (!name) { toast('Please enter the item name', 'error'); return; }
+  if (!location) { toast('Please select a location', 'error'); return; }
+  if (!description || description.length < 15) { toast('Please add a more detailed description (min 15 chars)', 'error'); return; }
+  if (!date) { toast('Please enter the date', 'error'); return; }
+  if (!reporterName) { toast('Please enter your name', 'error'); return; }
+  if (!contact) { toast('Please enter your contact details', 'error'); return; }
+
+  const nextId = state.items.length ? Math.max(...state.items.map(i => i.id)) + 1 : 100;
+  const pubId = 'FI-' + String(nextId).padStart(3, '0');
+  const now = new Date().toISOString().slice(0,16).replace('T', ' ');
+
+  state.items.unshift({
+    id: nextId, id_pub: pubId, type, category, name, location, description,
+    date, time, tags: [...formTags], images: [...previewFiles],
+    reporterName, contact,
+    status: 'active', adminResponse: '', broadcast: false, createdAt: now
+  });
+  saveState();
+  updateStats();
+  renderBrowse('lost');
+  renderBrowse('found');
+  renderMyItems();
+
+  // Reset form
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-description').value = '';
+  document.getElementById('f-reporter-name').value = '';
+  document.getElementById('f-contact').value = '';
+  document.getElementById('f-category').value = '';
+  document.getElementById('f-location').value = '';
+  document.getElementById('f-time').value = '';
+  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+  formTags = [];
+  previewFiles = [];
+  renderTagsInput();
+  renderPreviews();
+  renderTagSuggestions();
+
+  toast(`Report ${pubId} submitted! An admin will review it shortly.`);
+  setTab('my-items');
+}
+
+// ===================== MODAL =====================
+function openModal(itemId) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+  currentModal = item;
+  const cat = getCat(item.category);
+  document.getElementById('modal-title').textContent = item.name;
+
+  const imgWrap = document.getElementById('modal-img-wrap');
+  if (item.images && item.images[0]) {
+    imgWrap.innerHTML = `<img src="${item.images[0]}" alt="${item.name}" style="width:100%;border-radius:12px;object-fit:cover;max-height:260px;margin-bottom:1rem">`;
+  } else {
+    imgWrap.innerHTML = `<div class="modal-img">${cat.emoji}</div>`;
+  }
+
+  const tagsHtml = (item.tags || []).map(t => `<span class="modal-tag">${t}</span>`).join('');
+  const claimSection = item.type === 'found' && item.status === 'active' ? `
+    <div class="claim-area">
+      <div class="claim-title">🙋 Is this yours? Submit a claim</div>
+      <input class="claim-input" id="claim-name" placeholder="Your name">
+      <input class="claim-input" id="claim-contact" placeholder="Contact number or email">
+      <textarea class="claim-input" id="claim-proof" rows="2" placeholder="How can you prove this is yours? Describe unique details…"></textarea>
+      <button class="claim-btn" onclick="submitClaim(${item.id})">Submit Claim Request</button>
+    </div>` : '';
+  const ifFoundSection = item.type === 'lost' && item.status === 'active' ? `
+    <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--line)">
+      <button class="if-found-btn" onclick="closeModalDirect();openFinderModal(${item.id})">📣 I Found This — Contact Admin</button>
+      <p style="font-size:0.72rem;color:var(--slate);text-align:center;margin-top:0.4rem;line-height:1.4">Your lead will be reviewed by an admin before the owner is contacted</p>
+    </div>` : '';
+  const adminBox = item.adminResponse ? `
+    <div class="admin-response-box" style="margin-top:0.75rem">
+      <div class="admin-resp-label">Admin Response</div>
+      <div class="admin-resp-text">${item.adminResponse}</div>
+    </div>` : '';
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="detail-row"><span class="detail-key">Status</span><span class="detail-val"><span class="status-badge ${statusClass(item)}">${statusLabel(item)}</span></span></div>
+    <div class="detail-row"><span class="detail-key">Category</span><span class="detail-val">${cat.emoji} ${cat.label}</span></div>
+    <div class="detail-row"><span class="detail-key">Location</span><span class="detail-val">📍 ${item.location}</span></div>
+    <div class="detail-row"><span class="detail-key">Date</span><span class="detail-val">${fmt(item.date)}${item.time ? ' at ' + item.time : ''}</span></div>
+    <div class="detail-row"><span class="detail-key">Description</span><span class="detail-val">${item.description}</span></div>
+    <div class="detail-row"><span class="detail-key">Ref</span><span class="detail-val">${item.id_pub || '#'+item.id}</span></div>
+    ${tagsHtml ? `<div class="detail-row"><span class="detail-key">Tags</span><div class="modal-tags">${tagsHtml}</div></div>` : ''}
+    ${adminBox}
+    ${claimSection}
+    ${ifFoundSection}`;
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(e) { if (e.target === document.getElementById('modal-overlay')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modal-overlay').classList.remove('open'); currentModal = null; }
+function submitClaim(itemId) {
+  const name = document.getElementById('claim-name').value.trim();
+  const contact = document.getElementById('claim-contact').value.trim();
+  const proof = document.getElementById('claim-proof').value.trim();
+  if (!name || !contact || !proof) { toast('Please fill all claim fields', 'error'); return; }
+  const item = state.items.find(i => i.id === itemId);
+  if (item) {
+    item.claimRequest = { name, contact, proof, submittedAt: new Date().toISOString().slice(0,16).replace('T', ' ') };
+    saveState();
+  }
+  toast('Claim submitted! An admin will verify and contact you.');
+  closeModalDirect();
+}
+
+// ===================== FINDER LEAD MODAL =====================
+let finderTargetId = null;
+function openFinderModal(itemId) {
+  finderTargetId = itemId;
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+  document.getElementById('finder-item-ref').textContent = item.name + ' (' + (item.id_pub || '#' + itemId) + ')';
+  document.getElementById('finder-form-area').style.display = '';
+  document.getElementById('finder-success-area').style.display = 'none';
+  document.getElementById('fl-name').value = '';
+  document.getElementById('fl-contact').value = '';
+  document.getElementById('fl-where').value = '';
+  document.getElementById('fl-details').value = '';
+  document.getElementById('finder-modal-overlay').classList.add('open');
+}
+function closeFinderModal(e) {
+  if (!e || e.target === document.getElementById('finder-modal-overlay')) {
+    document.getElementById('finder-modal-overlay').classList.remove('open');
+    finderTargetId = null;
+  }
+}
+function submitFinderLead() {
+  const name = document.getElementById('fl-name').value.trim();
+  const contact = document.getElementById('fl-contact').value.trim();
+  const where = document.getElementById('fl-where').value.trim();
+  const details = document.getElementById('fl-details').value.trim();
+  if (!name) { toast('Please enter your name', 'error'); return; }
+  if (!contact) { toast('Please enter your contact details', 'error'); return; }
+  if (!where) { toast('Please describe where you found it', 'error'); return; }
+  if (!details || details.length < 10) { toast('Please describe more details (min 10 characters)', 'error'); return; }
+  const item = state.items.find(i => i.id === finderTargetId);
+  if (!item) return;
+  const lead = { name, contact, where, details, submittedAt: new Date().toISOString().slice(0,16).replace('T', ' '), status: 'pending' };
+  if (!item.finderLeads) item.finderLeads = [];
+  item.finderLeads.push(lead);
+  saveState();
+  document.getElementById('finder-form-area').style.display = 'none';
+  document.getElementById('finder-success-area').style.display = '';
+}
+
+// ===================== TAB SWITCHING =====================
+function setTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+  document.querySelectorAll('.tab-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.id === `panel-${tab}`);
+  });
+  if (tab === 'my-items') renderMyItems();
+  if (tab === 'notices') renderNotices();
+}
+
+// ===================== INIT =====================
+loadState();
+populateSelects();
+updateStats();
+renderBrowse('lost');
+renderBrowse('found');
+renderMyItems();
+renderNotices();
+</script>
+</body>
+</html>
