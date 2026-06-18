@@ -1,3 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FindIt Admin — Lost & Found Management</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0F1B2D;
+      --navy-mid: #1E3A5F;
+      --amber: #F59E0B;
+      --amber-light: #FEF3C7;
+      --amber-dark: #B45309;
+      --cream: #FAFAF7;
+      --white: #FFFFFF;
+      --slate: #64748B;
+      --slate-light: #F1F5F9;
+      --line: #E2E8F0;
+      --red: #EF4444;
+      --green: #10B981;
+      --green-light: #D1FAE5;
+      --red-light: #FEE2E2;
+      --blue: #3B82F6;
+      --blue-light: #DBEAFE;
+      --purple: #A855F7;
+      --purple-light: #F3E8FF;
+      --sidebar-w: 240px;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--slate-light); color: var(--navy); min-height: 100vh; }
+
+    /* LAYOUT */
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: var(--sidebar-w); background: var(--navy); display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; height: 100vh; z-index: 50; overflow-y: auto;
+    }
+    .sidebar-brand {
+      padding: 1.25rem 1.25rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .brand-row { display: flex; align-items: center; gap: 0.6rem; }
+    .brand-icon { width: 36px; height: 36px; background: var(--amber); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .brand-name { color: white; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
+    .brand-sub { color: var(--amber); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; }
+    .admin-badge { margin-top: 0.5rem; display: inline-block; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: var(--amber); font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 6px; width: fit-content; }
+    .sidebar-nav { padding: 1rem 0.75rem; flex: 1; }
+    .nav-section-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.3); padding: 0 0.5rem; margin-bottom: 0.4rem; margin-top: 1rem; }
+    .nav-item {
+      display: flex; align-items: center; gap: 0.65rem; padding: 0.6rem 0.75rem;
+      border-radius: 10px; cursor: pointer; color: rgba(255,255,255,0.65); font-size: 0.83rem; font-weight: 500;
+      transition: all 0.15s; margin-bottom: 0.15rem; border: none; background: transparent; width: 100%; text-align: left;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.07); color: white; }
+    .nav-item.active { background: rgba(245,158,11,0.15); color: var(--amber); }
+    .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .nav-badge { margin-left: auto; background: var(--amber); color: var(--navy); font-size: 0.65rem; font-weight: 800; padding: 0.1rem 0.4rem; border-radius: 999px; }
+    .nav-badge.pulse { animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08); }
+    .public-link { display: flex; align-items: center; gap: 0.4rem; color: rgba(255,255,255,0.5); font-size: 0.75rem; text-decoration: none; }
+    .public-link:hover { color: white; }
+
+    /* MAIN */
+    .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+    .topbar {
+      background: white; border-bottom: 1px solid var(--line); padding: 0 2rem;
+      height: 60px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 40;
+    }
+    .topbar-title { font-size: 1.1rem; font-weight: 700; color: var(--navy); }
+    .topbar-sub { font-size: 0.75rem; color: var(--slate); }
+    .topbar-right { display: flex; gap: 0.75rem; align-items: center; }
+    .refresh-btn {
+      padding: 0.45rem 1rem; border-radius: 8px; border: 1.5px solid var(--line);
+      background: transparent; color: var(--slate); font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .refresh-btn:hover { background: var(--slate-light); }
+
+    .content { padding: 2rem; }
+
+    /* CARDS */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    @media (max-width: 900px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card {
+      background: white; border: 1px solid var(--line); border-radius: 14px; padding: 1.25rem;
+      display: flex; flex-direction: column; gap: 0.4rem;
+    }
+    .stat-card-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate); }
+    .stat-card-num { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.04em; }
+    .stat-card-sub { font-size: 0.73rem; color: var(--slate); }
+    .stat-card.amber .stat-card-num { color: var(--amber-dark); }
+    .stat-card.navy .stat-card-num { color: var(--navy); }
+    .stat-card.green .stat-card-num { color: var(--green); }
+    .stat-card.red .stat-card-num { color: var(--red); }
+    .stat-card.blue .stat-card-num { color: var(--blue); }
+    .stat-card.purple .stat-card-num { color: var(--purple); }
+
+    /* TABLE / QUEUE */
+    .panel { background: white; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; margin-bottom: 1.5rem; }
+    .panel-head { padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .panel-title { font-size: 1rem; font-weight: 700; color: var(--navy); }
+    .panel-sub { font-size: 0.75rem; color: var(--slate); }
+    .panel-body { padding: 1.25rem 1.5rem; }
+
+    .item-queue { display: flex; flex-direction: column; gap: 1rem; }
+    .queue-item {
+      border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.25rem;
+      display: flex; gap: 1rem; align-items: flex-start; transition: box-shadow 0.15s;
+    }
+    .queue-item:hover { box-shadow: 0 4px 16px rgba(15,27,45,0.07); }
+    .queue-img { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; background: var(--slate-light); display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; }
+    .queue-info { flex: 1; min-width: 0; }
+    .queue-name { font-weight: 700; font-size: 0.95rem; color: var(--navy); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .queue-desc { font-size: 0.8rem; color: var(--slate); margin-bottom: 0.4rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .queue-meta { font-size: 0.72rem; color: var(--slate); display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.5rem; }
+
+    /* STATUS BADGE */
+    .sbadge {
+      padding: 0.2rem 0.55rem; border-radius: 999px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .sbadge-lost { background: var(--red-light); color: var(--red); }
+    .sbadge-found { background: var(--green-light); color: #059669; }
+    .sbadge-resolved { background: #DBEAFE; color: #1E40AF; }
+    .sbadge-claimed { background: var(--slate-light); color: var(--slate); }
+    .sbadge-pending { background: #FEF9C3; color: #854D0E; }
+    .sbadge-reviewed { background: var(--green-light); color: #059669; }
+
+    /* BUTTONS */
+    .btn {
+      padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.15s; display: inline-flex; align-items: center; gap: 0.3rem;
+    }
+    .btn-navy { background: var(--navy); color: white; }
+    .btn-navy:hover { background: var(--navy-mid); }
+    .btn-amber { background: var(--amber); color: var(--navy); }
+    .btn-amber:hover { background: #FBBF24; }
+    .btn-ghost { background: transparent; border: 1.5px solid var(--line); color: var(--slate); }
+    .btn-ghost:hover { background: var(--slate-light); }
+    .btn-red { background: var(--red-light); color: var(--red); border: 1px solid #FCA5A5; }
+    .btn-red:hover { background: #FEE2E2; }
+    .btn-green { background: var(--green-light); color: #059669; border: 1px solid #6EE7B7; }
+    .btn-green:hover { background: #D1FAE5; }
+    .btn-purple { background: var(--purple-light); color: var(--purple); border: 1px solid #E9D5FF; }
+    .btn-purple:hover { background: #F3E8FF; }
+
+    /* FILTERS ROW */
+    .filters-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .fselect, .finput {
+      padding: 0.45rem 0.85rem; border: 1.5px solid var(--line); border-radius: 9px;
+      font-size: 0.8rem; background: var(--white); color: var(--navy); outline: none; font-family: inherit;
+    }
+    .fselect:focus, .finput:focus { border-color: var(--amber); }
+    .finput { flex: 1; min-width: 180px; }
+
+    /* COMPLAINT CARD */
+    .complaint-card {
+      background: var(--purple-light); border: 1px solid #E9D5FF; border-radius: 10px; padding: 0.75rem 1rem;
+      margin-top: 0.75rem;
+    }
+    .complaint-card-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--purple); margin-bottom: 0.4rem; }
+    .complaint-card-field { font-size: 0.8rem; color: var(--navy); margin-bottom: 0.15rem; }
+    .complaint-card-field span { color: var(--slate); }
+    .complaint-actions { margin-top: 0.5rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+    /* RESPONSE AREA */
+    .response-area {
+      margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--line);
+    }
+    .resp-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--slate); margin-bottom: 0.4rem; }
+    .resp-input {
+      width: 100%; padding: 0.55rem 0.85rem; border: 1.5px solid var(--line); border-radius: 9px;
+      font-size: 0.83rem; font-family: inherit; outline: none; margin-bottom: 0.5rem; resize: vertical; min-height: 70px;
+    }
+    .resp-input:focus { border-color: var(--amber); }
+    .resp-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+
+    /* TOAST */
+    #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 300; display: flex; flex-direction: column; gap: 0.5rem; }
+    .toast { padding: 0.75rem 1.1rem; border-radius: 10px; font-size: 0.83rem; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.15); max-width: 320px; animation: slideIn 0.2s ease; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .toast-success { background: var(--navy); color: var(--white); }
+    .toast-error { background: var(--red); color: var(--white); }
+
+    /* EMPTY */
+    .empty-state { text-align: center; padding: 3rem 1rem; }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .empty-title { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 0.3rem; }
+    .empty-desc { font-size: 0.82rem; color: var(--slate); }
+
+    /* TAB PANELS */
+    .view-panel { display: none; }
+    .view-panel.active { display: block; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-row">
+        <div class="brand-icon">🔍</div>
+        <div>
+          <div class="brand-name">FindIt</div>
+          <div class="brand-sub">Lost & Found</div>
+        </div>
+      </div>
+      <div class="admin-badge">Admin Portal</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <button class="nav-item active" data-view="dashboard" onclick="setView('dashboard')">
+        <span class="nav-icon">📊</span> Dashboard
+      </button>
+      <div class="nav-section-label">Manage Reports</div>
+      <button class="nav-item" data-view="complaints" onclick="setView('complaints')">
+        <span class="nav-icon">📋</span> User Complaints
+        <span class="nav-badge pulse" id="badge-complaints">0</span>
+      </button>
+      <button class="nav-item" data-view="finder-leads" onclick="setView('finder-leads')">
+        <span class="nav-icon">📣</span> Finder Leads
+        <span class="nav-badge pulse" id="badge-leads">0</span>
+      </button>
+      <div class="nav-section-label">Queue Management</div>
+      <button class="nav-item" data-view="lost-queue" onclick="setView('lost-queue')">
+        <span class="nav-icon">🔴</span> Lost Items Queue
+        <span class="nav-badge" id="badge-lost">0</span>
+      </button>
+      <button class="nav-item" data-view="found-queue" onclick="setView('found-queue')">
+        <span class="nav-icon">🟢</span> Found Items Queue
+        <span class="nav-badge" id="badge-found">0</span>
+      </button>
+      <button class="nav-item" data-view="claims" onclick="setView('claims')">
+        <span class="nav-icon">🙋</span> Claim Requests
+        <span class="nav-badge" id="badge-claims">0</span>
+      </button>
+      <div class="nav-section-label">Archive</div>
+      <button class="nav-item" data-view="resolved" onclick="setView('resolved')">
+        <span class="nav-icon">✅</span> Resolved Items
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="findit-public.html" class="public-link">↗ View public board</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div class="topbar-sub" id="topbar-sub">Overview of all Lost & Found activity</div>
+      </div>
+      <div class="topbar-right">
+        <button class="refresh-btn" onclick="refresh()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="view-panel active" id="view-dashboard">
+        <div class="stats-row">
+          <div class="stat-card red">
+            <div class="stat-card-label">Active Lost Items</div>
+            <div class="stat-card-num" id="d-lost">0</div>
+            <div class="stat-card-sub">Awaiting match or resolution</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-card-label">Items Found</div>
+            <div class="stat-card-num" id="d-found">0</div>
+            <div class="stat-card-sub">Turned in, awaiting claim</div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-card-label">Pending Complaints</div>
+            <div class="stat-card-num" id="d-complaints">0</div>
+            <div class="stat-card-sub">User reports awaiting review</div>
+          </div>
+          <div class="stat-card amber">
+            <div class="stat-card-label">Pending Leads</div>
+            <div class="stat-card-num" id="d-leads">0</div>
+            <div class="stat-card-sub">Finder leads awaiting review</div>
+          </div>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Recent Activity</div>
+              <div class="panel-sub">Latest reports and submissions</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="item-queue" id="dash-recent"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- USER COMPLAINTS -->
+      <div class="view-panel" id="view-complaints">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">📋 User Complaints & Reports</div>
+              <div class="panel-sub">Review complaints submitted by users about lost/found items</div>
+            </div>
+            <div class="filters-row">
+              <input class="finput" id="complaint-search" placeholder="Search…" oninput="renderComplaints()" style="max-width:180px">
+              <select class="fselect" id="complaint-status" onchange="renderComplaints()">
+                <option value="">All statuses</option>
+                <option value="pending">Pending</option>
+                <option value="reviewed">Reviewed</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="item-queue" id="complaints-queue"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINDER LEADS -->
+      <div class="view-panel" id="view-finder-leads">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">📣 Finder Leads</div>
+              <div class="panel-sub">Review and manage finder submissions for lost items</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="leads-container"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOST QUEUE -->
+      <div class="view-panel" id="view-lost-queue">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">🔴 Lost Items Queue</div>
+              <div class="panel-sub">Review and respond to lost item reports</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="item-queue" id="queue-lost"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOUND QUEUE -->
+      <div class="view-panel" id="view-found-queue">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">🟢 Found Items Queue</div>
+              <div class="panel-sub">Review turned-in items and process claims</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="item-queue" id="queue-found"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLAIMS -->
+      <div class="view-panel" id="view-claims">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">🙋 Claim Requests</div>
+              <div class="panel-sub">Review ownership claims submitted by users</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="item-queue" id="queue-claims"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESOLVED -->
+      <div class="view-panel" id="view-resolved">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">✅ Resolved & Reunited</div>
+              <div class="panel-sub">Items that have been successfully resolved</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="item-queue" id="queue-resolved"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+// ===================== DATA =====================
+const STORAGE_KEY = 'findit-v1';
+const COMPLAINTS_KEY = 'findit-complaints-v1';
+
+let state = { items: [], complaints: [] };
+
 const SEED_ITEMS = [
   { id: 1, type: 'lost', category: 'electronics', name: 'Samsung Galaxy A54', description: 'Black Samsung Galaxy A54 with a cracked screen protector. Found missing after BUS 214 class.', location: 'Faculty of Science', date: '2026-06-16', time: '14:30', reporterName: 'Chioma O.', contact: '+234 803 456 7890', createdAt: '2026-06-16 14:35', status: 'active', finderLeads: [
     { finderName: 'Emeka J.', finderContact: '+234 802 111 2222', finderLocation: 'Cafeteria, Block B', finderMessage: 'I found a black Samsung phone in the cafeteria yesterday. I have it with me.', status: 'pending', submittedAt: '2026-06-17 09:15' },
@@ -12,3 +429,314 @@ const SEED_ITEMS = [
     { finderName: 'David O.', finderContact: '+234 801 444 5555', finderLocation: 'ICT Centre lab 2', finderMessage: 'I found a charger in lab 2 yesterday. It looks like an HP charger.', status: 'pending', submittedAt: '2026-06-17 11:20' }
   ]},
 ];
+
+const SEED_COMPLAINTS = [
+  { id: 1, reporterName: 'Okafor M.', reporterContact: '+234 809 123 4567', type: 'lost', itemName: 'Airpods Pro', description: 'I lost my Airpods Pro somewhere on campus yesterday. They were in a white case. Pls help!', location: 'Somewhere on campus', submittedAt: '2026-06-17 08:30', status: 'pending', adminResponse: '', adminReviewedAt: null },
+  { id: 2, reporterName: 'Blessing A.', reporterContact: '+234 812 987 6543', type: 'found', itemName: 'Black wallet with money', description: 'I found a black leather wallet near the library gate. It has cash inside and some ID cards. Please claim at admin office.', location: 'Library gate', submittedAt: '2026-06-17 09:45', status: 'pending', adminResponse: '', adminReviewedAt: null },
+  { id: 3, reporterName: 'Chidi L.', reporterContact: '+234 805 555 8888', type: 'lost', itemName: 'Silver watch', description: 'Lost my silver watch with brown leather strap in the lecture hall. Very sentimental. Reward for return.', location: 'Science block lecture hall', submittedAt: '2026-06-17 10:15', status: 'reviewed', adminResponse: 'Thank you for the report. We are checking our found items database for a match.', adminReviewedAt: '2026-06-17 11:00' },
+];
+
+function loadState() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    state.items = Array.isArray(raw.items) ? raw.items : SEED_ITEMS.map(i => ({...i}));
+    const craw = JSON.parse(localStorage.getItem(COMPLAINTS_KEY) || '{}');
+    state.complaints = Array.isArray(craw.complaints) ? craw.complaints : SEED_COMPLAINTS.map(c => ({...c}));
+  } catch {
+    state.items = SEED_ITEMS.map(i => ({...i}));
+    state.complaints = SEED_COMPLAINTS.map(c => ({...c}));
+  }
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: state.items }));
+  localStorage.setItem(COMPLAINTS_KEY, JSON.stringify({ complaints: state.complaints }));
+}
+
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ===================== STATS =====================
+function updateStats() {
+  const lost = state.items.filter(i => i.type === 'lost' && i.status === 'active').length;
+  const found = state.items.filter(i => i.type === 'found' && i.status === 'active').length;
+  const complaints = state.complaints.filter(c => c.status === 'pending').length;
+  const leads = state.items.filter(i => i.finderLeads && i.finderLeads.some(l => l.status === 'pending')).length;
+  
+  document.getElementById('d-lost').textContent = lost;
+  document.getElementById('d-found').textContent = found;
+  document.getElementById('d-complaints').textContent = complaints;
+  document.getElementById('d-leads').textContent = leads;
+  document.getElementById('badge-lost').textContent = lost;
+  document.getElementById('badge-found').textContent = found;
+  document.getElementById('badge-complaints').textContent = complaints;
+  document.getElementById('badge-leads').textContent = leads;
+}
+
+// ===================== COMPLAINTS =====================
+function renderComplaints() {
+  const search = (document.getElementById('complaint-search')?.value || '').toLowerCase();
+  const status = document.getElementById('complaint-status')?.value || '';
+  
+  let complaints = [...state.complaints];
+  if (status) complaints = complaints.filter(c => c.status === status);
+  if (search) complaints = complaints.filter(c => c.itemName.toLowerCase().includes(search) || c.reporterName.toLowerCase().includes(search) || c.description.toLowerCase().includes(search));
+  complaints.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+  const el = document.getElementById('complaints-queue');
+  if (!complaints.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No complaints</div><div class="empty-desc">User complaints will appear here for you to review and respond to</div></div>`;
+    return;
+  }
+
+  el.innerHTML = complaints.map(c => `
+    <div class="queue-item">
+      <div class="queue-img" style="background:${c.type === 'lost' ? 'var(--red-light)' : 'var(--green-light)'}; font-size:1.5rem">${c.type === 'lost' ? '🔴' : '🟢'}</div>
+      <div class="queue-info">
+        <div class="queue-name">
+          ${c.itemName}
+          <span class="sbadge sbadge-${c.status === 'pending' ? 'pending' : c.status === 'reviewed' ? 'reviewed' : 'resolved'}">${c.status}</span>
+        </div>
+        <div class="queue-desc">${c.description}</div>
+        <div class="queue-meta">
+          <span>👤 ${c.reporterName} · ${c.reporterContact}</span>
+          <span>📍 ${c.location}</span>
+          <span>📅 ${c.submittedAt}</span>
+        </div>
+        
+        <div class="complaint-card">
+          <div class="complaint-card-title">${c.type === 'lost' ? '🔴 Lost Report' : '🟢 Found Report'}</div>
+          <div class="complaint-card-field"><strong>Reporter:</strong> <span>${c.reporterName}</span></div>
+          <div class="complaint-card-field"><strong>Contact:</strong> <span>${c.reporterContact}</span></div>
+          <div class="complaint-card-field"><strong>Location:</strong> <span>${c.location}</span></div>
+          <div class="complaint-card-field"><strong>Item:</strong> <span>${c.itemName}</span></div>
+          <div class="complaint-card-field"><strong>Submitted:</strong> <span>${c.submittedAt}</span></div>
+          ${c.status === 'reviewed' ? `<div class="complaint-card-field" style="color:var(--green); font-weight:600;">✓ Reviewed on ${c.adminReviewedAt}</div>` : ''}
+          
+          <div class="response-area">
+            <div class="resp-label">Admin Response</div>
+            <textarea class="resp-input" id="resp-complaint-${c.id}" placeholder="Write response to user…">${c.adminResponse || ''}</textarea>
+            <div class="resp-row">
+              <select id="status-complaint-${c.id}" class="fselect" style="flex:1;">
+                <option value="pending" ${c.status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="reviewed" ${c.status === 'reviewed' ? 'selected' : ''}>Reviewed</option>
+                <option value="resolved" ${c.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+              </select>
+              <button class="btn btn-purple" onclick="saveComplaint(${c.id})">Save Response</button>
+              <button class="btn btn-red" onclick="deleteComplaint(${c.id})">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function saveComplaint(id) {
+  const complaint = state.complaints.find(c => c.id === id);
+  if (!complaint) return;
+  
+  const respEl = document.getElementById(`resp-complaint-${id}`);
+  const statusEl = document.getElementById(`status-complaint-${id}`);
+  
+  if (respEl) complaint.adminResponse = respEl.value.trim();
+  if (statusEl) complaint.status = statusEl.value;
+  
+  if (complaint.status === 'reviewed' && !complaint.adminReviewedAt) {
+    complaint.adminReviewedAt = new Date().toISOString().slice(0,16).replace('T', ' ');
+  }
+  
+  saveState();
+  updateStats();
+  toast('Complaint updated!');
+  renderComplaints();
+}
+
+function deleteComplaint(id) {
+  if (!confirm('Delete this complaint permanently?')) return;
+  state.complaints = state.complaints.filter(c => c.id !== id);
+  saveState();
+  updateStats();
+  toast('Complaint deleted');
+  renderComplaints();
+}
+
+// ===================== FINDER LEADS =====================
+function renderFinderLeads() {
+  const leadsItems = state.items.filter(i => i.finderLeads && i.finderLeads.length > 0);
+  const el = document.getElementById('leads-container');
+  
+  if (!leadsItems.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📣</div><div class="empty-title">No finder leads yet</div></div>`;
+    return;
+  }
+
+  let html = '';
+  leadsItems.forEach(item => {
+    if (!item.finderLeads || !item.finderLeads.length) return;
+    
+    const leadsHtml = item.finderLeads.map((lead, idx) => `
+      <div style="border:1px solid var(--line); border-radius:10px; padding:0.75rem 1rem; margin-bottom:0.75rem; background:white;">
+        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+          <strong>${lead.finderName}</strong>
+          <span class="sbadge" style="background:${lead.status === 'verified' ? 'var(--green-light)' : 'var(--amber-light)'}; color:${lead.status === 'verified' ? '#059669' : 'var(--amber-dark)'};">${lead.status.toUpperCase()}</span>
+        </div>
+        <div style="font-size:0.75rem; color:var(--slate); margin-bottom:0.3rem;">📞 ${lead.finderContact}</div>
+        <div style="font-size:0.75rem; color:var(--slate); margin-bottom:0.3rem;">📍 ${lead.finderLocation}</div>
+        <div style="font-size:0.75rem; color:var(--slate); margin-bottom:0.4rem;">💬 ${lead.finderMessage}</div>
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+          ${lead.status === 'pending' ? `
+            <button class="btn btn-green" onclick="verifyLead(${item.id}, ${idx})">✔ Mark Verified</button>
+            <button class="btn btn-red" onclick="rejectLead(${item.id}, ${idx})">✕ Reject</button>
+          ` : ''}
+          ${lead.status === 'verified' ? `
+            <button class="btn btn-amber" onclick="forwardLeadToOwner(${item.id}, ${idx})">📨 Forward to Owner</button>
+          ` : ''}
+        </div>
+      </div>
+    `).join('');
+
+    html += `
+      <div style="margin-bottom:1.5rem; border-left:4px solid var(--amber); padding-left:1rem;">
+        <div style="font-weight:700; color:var(--navy); margin-bottom:0.75rem;">📦 ${item.name} <span style="font-size:0.7rem;color:var(--slate);">#${item.id}</span></div>
+        ${leadsHtml}
+      </div>
+    `;
+  });
+
+  el.innerHTML = html;
+}
+
+function verifyLead(itemId, leadIdx) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item || !item.finderLeads || !item.finderLeads[leadIdx]) return;
+  item.finderLeads[leadIdx].status = 'verified';
+  item.finderLeads[leadIdx].verifiedAt = new Date().toISOString().slice(0,16).replace('T', ' ');
+  saveState();
+  updateStats();
+  toast('Lead marked as verified!');
+  renderFinderLeads();
+}
+
+function rejectLead(itemId, leadIdx) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item || !item.finderLeads || !item.finderLeads[leadIdx]) return;
+  if (!confirm('Reject this lead?')) return;
+  item.finderLeads.splice(leadIdx, 1);
+  saveState();
+  updateStats();
+  toast('Lead rejected');
+  renderFinderLeads();
+}
+
+function forwardLeadToOwner(itemId, leadIdx) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item || !item.finderLeads || !item.finderLeads[leadIdx]) return;
+  const lead = item.finderLeads[leadIdx];
+  item.status = 'claimed';
+  item.finderLeads[leadIdx].status = 'forwarded';
+  item.finderLeads[leadIdx].forwardedAt = new Date().toISOString().slice(0,16).replace('T', ' ');
+  saveState();
+  updateStats();
+  toast('Lead forwarded to owner! Item marked as Claimed.');
+  renderFinderLeads();
+}
+
+// ===================== RENDER QUEUES =====================
+function renderQueue(type) {
+  let items = state.items.filter(i => i.type === type);
+  items.sort((a,b) => b.id - a.id);
+  const el = document.getElementById(`queue-${type}`);
+  if (!items.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">${type === 'lost' ? '🔴' : '🟢'}</div><div class="empty-title">No ${type} items</div></div>`;
+    return;
+  }
+  el.innerHTML = items.map(i => `
+    <div class="queue-item">
+      <div class="queue-img" style="background:${type === 'lost' ? 'var(--red-light)' : 'var(--green-light)'}; font-size:1.5rem">${type === 'lost' ? '🔴' : '🟢'}</div>
+      <div class="queue-info">
+        <div class="queue-name">${i.name} <span class="sbadge sbadge-${i.status}">${i.status}</span></div>
+        <div class="queue-desc">${i.description}</div>
+        <div class="queue-meta">
+          <span>📍 ${i.location}</span>
+          <span>👤 ${i.reporterName}</span>
+          <span>📅 ${i.createdAt}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderResolved() {
+  const items = state.items.filter(i => i.status === 'resolved' || i.status === 'claimed').sort((a,b) => b.id - a.id);
+  const el = document.getElementById('queue-resolved');
+  if (!items.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-title">No resolved items</div></div>`;
+    return;
+  }
+  el.innerHTML = items.map(i => `
+    <div class="queue-item">
+      <div class="queue-img" style="font-size:1.5rem">✅</div>
+      <div class="queue-info">
+        <div class="queue-name">${i.name}</div>
+        <div class="queue-meta">
+          <span>📍 ${i.location}</span>
+          <span>👤 ${i.reporterName}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===================== VIEW SWITCHING =====================
+const VIEW_TITLES = {
+  'dashboard': ['Dashboard', 'Overview of all Lost & Found activity'],
+  'complaints': ['User Complaints & Reports', 'Review complaints submitted by users'],
+  'finder-leads': ['Finder Leads', 'Review finder submissions for lost items'],
+  'lost-queue': ['Lost Items Queue', 'Review lost item reports'],
+  'found-queue': ['Found Items Queue', 'Review found items'],
+  'claims': ['Claim Requests', 'Review ownership claims'],
+  'resolved': ['Resolved Items', 'Items that have been resolved'],
+};
+
+function setView(view) {
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.toggle('active', p.id === `view-${view}`));
+  document.querySelectorAll('.nav-item').forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
+  const [title, sub] = VIEW_TITLES[view] || [view, ''];
+  document.getElementById('topbar-title').textContent = title;
+  document.getElementById('topbar-sub').textContent = sub;
+  
+  if (view === 'complaints') renderComplaints();
+  if (view === 'finder-leads') renderFinderLeads();
+  if (view === 'lost-queue') renderQueue('lost');
+  if (view === 'found-queue') renderQueue('found');
+  if (view === 'resolved') renderResolved();
+  if (view === 'dashboard') renderAll();
+}
+
+function renderAll() {
+  updateStats();
+  renderQueue('lost');
+  renderQueue('found');
+  renderResolved();
+  renderComplaints();
+  renderFinderLeads();
+}
+
+function refresh() {
+  loadState();
+  renderAll();
+  toast('Refreshed');
+}
+
+// ===================== INIT =====================
+loadState();
+renderAll();
+</script>
+</body>
+</html>
