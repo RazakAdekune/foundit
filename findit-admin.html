@@ -21,6 +21,8 @@
       --green: #10B981;
       --green-light: #D1FAE5;
       --red-light: #FEE2E2;
+      --blue: #3B82F6;
+      --blue-light: #DBEAFE;
       --sidebar-w: 240px;
     }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--slate-light); color: var(--navy); min-height: 100vh; }
@@ -38,7 +40,7 @@
     .brand-icon { width: 36px; height: 36px; background: var(--amber); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
     .brand-name { color: white; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
     .brand-sub { color: var(--amber); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; }
-    .admin-badge { margin-top: 0.5rem; display: inline-block; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: var(--amber); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 6px; }
+    .admin-badge { margin-top: 0.5rem; display: inline-block; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: var(--amber); font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 6px; width: fit-content; }
     .sidebar-nav { padding: 1rem 0.75rem; flex: 1; }
     .nav-section-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.3); padding: 0 0.5rem; margin-bottom: 0.4rem; margin-top: 1rem; }
     .nav-item {
@@ -50,6 +52,8 @@
     .nav-item.active { background: rgba(245,158,11,0.15); color: var(--amber); }
     .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
     .nav-badge { margin-left: auto; background: var(--amber); color: var(--navy); font-size: 0.65rem; font-weight: 800; padding: 0.1rem 0.4rem; border-radius: 999px; }
+    .nav-badge.pulse { animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
     .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08); }
     .public-link { display: flex; align-items: center; gap: 0.4rem; color: rgba(255,255,255,0.5); font-size: 0.75rem; text-decoration: none; }
     .public-link:hover { color: white; }
@@ -87,6 +91,7 @@
     .stat-card.navy .stat-card-num { color: var(--navy); }
     .stat-card.green .stat-card-num { color: var(--green); }
     .stat-card.red .stat-card-num { color: var(--red); }
+    .stat-card.blue .stat-card-num { color: var(--blue); }
 
     /* TABLE / QUEUE */
     .panel { background: white; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; margin-bottom: 1.5rem; }
@@ -119,6 +124,7 @@
     .sbadge-resolved { background: #DBEAFE; color: #1E40AF; }
     .sbadge-claimed { background: var(--slate-light); color: var(--slate); }
     .sbadge-pending { background: #FEF9C3; color: #854D0E; }
+    .sbadge-verified { background: var(--green-light); color: #059669; }
 
     /* BUTTONS */
     .btn {
@@ -183,6 +189,38 @@
     .claim-card-field { font-size: 0.8rem; color: var(--navy); margin-bottom: 0.15rem; }
     .claim-card-field span { color: var(--slate); }
 
+    /* FINDER LEAD CARD */
+    .finder-lead-card {
+      background: var(--blue-light); border: 1px solid #BFDBFE; border-radius: 10px; padding: 0.75rem 1rem;
+      margin-top: 0.75rem;
+    }
+    .finder-lead-card-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #1E40AF; margin-bottom: 0.4rem; }
+    .finder-lead-card-field { font-size: 0.8rem; color: var(--navy); margin-bottom: 0.15rem; }
+    .finder-lead-card-field span { color: var(--slate); }
+    .finder-lead-card-field.hidden { display: none; }
+    .finder-lead-card-field.hidden.revealed { display: block; }
+    .finder-lead-actions { margin-top: 0.5rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+    /* GROUPED LEADS */
+    .leads-group {
+      margin-bottom: 1.5rem; border-left: 4px solid var(--blue); padding-left: 1rem;
+    }
+    .leads-group-header {
+      font-weight: 700; font-size: 0.9rem; color: var(--navy); margin-bottom: 0.75rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .leads-items { display: flex; flex-direction: column; gap: 0.75rem; }
+    .lead-item {
+      border: 1px solid var(--line); border-radius: 10px; padding: 0.75rem 1rem;
+      background: white; transition: box-shadow 0.15s;
+    }
+    .lead-item:hover { box-shadow: 0 2px 8px rgba(15,27,45,0.07); }
+    .lead-item-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+    .lead-item-name { font-weight: 600; color: var(--navy); font-size: 0.85rem; }
+    .lead-item-badge { font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.35rem; border-radius: 6px; }
+    .lead-item-detail { font-size: 0.75rem; color: var(--slate); margin-bottom: 0.2rem; }
+    .lead-item-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.4rem; }
+
     /* TOAST */
     #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 300; display: flex; flex-direction: column; gap: 0.5rem; }
     .toast { padding: 0.75rem 1.1rem; border-radius: 10px; font-size: 0.83rem; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.15); max-width: 320px; animation: slideIn 0.2s ease; }
@@ -231,6 +269,10 @@
         <span class="nav-icon">📊</span> Dashboard
       </button>
       <div class="nav-section-label">Queue Management</div>
+      <button class="nav-item" data-view="finder-leads" onclick="setView('finder-leads')">
+        <span class="nav-icon">📣</span> Finder Leads
+        <span class="nav-badge pulse" id="badge-leads">0</span>
+      </button>
       <button class="nav-item" data-view="lost-queue" onclick="setView('lost-queue')">
         <span class="nav-icon">🔴</span> Lost Items Queue
         <span class="nav-badge" id="badge-lost">0</span>
@@ -285,14 +327,14 @@
             <div class="stat-card-sub">Turned in, awaiting claim</div>
           </div>
           <div class="stat-card amber">
-            <div class="stat-card-label">Claim Requests</div>
-            <div class="stat-card-num" id="d-claims">0</div>
-            <div class="stat-card-sub">Awaiting admin review</div>
+            <div class="stat-card-label">Pending Leads</div>
+            <div class="stat-card-num" id="d-leads">0</div>
+            <div class="stat-card-sub">Finder leads awaiting review</div>
           </div>
-          <div class="stat-card navy">
-            <div class="stat-card-label">Reunited Items</div>
-            <div class="stat-card-num" id="d-resolved">0</div>
-            <div class="stat-card-sub">Claimed or resolved</div>
+          <div class="stat-card blue">
+            <div class="stat-card-label">Verified Matches</div>
+            <div class="stat-card-num" id="d-verified">0</div>
+            <div class="stat-card-sub">Verified finder leads</div>
           </div>
         </div>
 
@@ -309,6 +351,21 @@
           </div>
           <div class="panel-body">
             <div class="item-queue" id="dash-recent"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINDER LEADS -->
+      <div class="view-panel" id="view-finder-leads">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">📣 Finder Leads</div>
+              <div class="panel-sub">Review and manage finder submissions for lost items</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="leads-container"></div>
           </div>
         </div>
       </div>
@@ -458,16 +515,16 @@ const CATEGORIES = [
 ];
 
 const SEED_ITEMS = [
-  { id: 1, type: 'lost', category: 'electronics', name: 'Samsung Galaxy A54', description: 'Black Samsung Galaxy A54 with a cracked screen protector. Found missing after BUS 214 class.', location: 'Lecture Hall A', date: '2026-06-10', time: '13:00', tags: ['black', 'Samsung', 'cracked screen'], images: [], reporterName: 'Adebayo Ibrahim', contact: '08012345678', status: 'active', adminResponse: '', broadcast: false, createdAt: '2026-06-10 13:25', id_pub: 'FI-001' },
-  { id: 2, type: 'found', category: 'keys', name: 'Bunch of keys with red tag', description: 'Found a bunch of keys near the library entrance. Has a red lanyard tag.', location: 'Main Library', date: '2026-06-11', time: '09:00', tags: ['red', 'with strap'], images: [], reporterName: 'Hassan Mariam', contact: 'hassan@student.lasu.edu.ng', status: 'active', adminResponse: 'Item secured at the Lost & Found desk.', broadcast: true, createdAt: '2026-06-11 09:40', id_pub: 'FI-002' },
-  { id: 3, type: 'lost', category: 'bags', name: 'Brown leather backpack', description: 'Dark brown leather backpack, Zara brand. Contains notebooks and a blue pencil case.', location: 'Faculty of Science', date: '2026-06-12', time: '11:00', tags: ['brown', 'branded', 'broken zipper'], images: [], reporterName: 'Olawale Precious', contact: '07098765432', status: 'active', adminResponse: '', broadcast: false, createdAt: '2026-06-12 11:55', id_pub: 'FI-003' },
-  { id: 4, type: 'found', category: 'documents', name: 'LASU Student ID Card', description: 'Found a LASU ID card near the Engineering Block. Name on card is partially visible.', location: 'Engineering Block', date: '2026-06-13', time: '15:30', tags: ['school ID', 'name written'], images: [], reporterName: 'Aisha Bello', contact: '09011223344', status: 'claimed', adminResponse: 'Owner identified and item returned.', broadcast: false, createdAt: '2026-06-13 16:00', id_pub: 'FI-004', claimRequest: { name: 'Emeka Osei', contact: '08023456789', proof: 'My student number is 22/1190, I can verify in person.', submittedAt: '2026-06-14 10:00' } },
-  { id: 5, type: 'lost', category: 'electronics', name: 'HP Laptop Charger', description: '65W HP laptop charger, black, left in ICT Centre computer lab after evening session.', location: 'ICT Centre', date: '2026-06-14', time: '18:00', tags: ['HP', 'black', 'charger'], images: [], reporterName: 'Emeka Okafor', contact: 'emeka@student.lasu.edu.ng', status: 'resolved', adminResponse: 'Charger found and returned to owner.', broadcast: false, createdAt: '2026-06-14 20:10', id_pub: 'FI-005' },
+  { id: 1, type: 'lost', category: 'electronics', name: 'Samsung Galaxy A54', description: 'Black Samsung Galaxy A54 with a cracked screen protector. Found missing after BUS 214 class.', location: 'Faculty of Science', date: '2026-06-16', time: '14:30', reporterName: 'Chioma O.', contact: '+234 803 456 7890', createdAt: '2026-06-16 14:35', status: 'active' },
+  { id: 2, type: 'found', category: 'keys', name: 'Bunch of keys with red tag', description: 'Found a bunch of keys near the library entrance. Has a red lanyard tag.', location: 'Main Library', date: '2026-06-16', reporterName: 'Tunde M.', contact: '+234 805 123 4567', createdAt: '2026-06-16 15:10', status: 'active' },
+  { id: 3, type: 'lost', category: 'bags', name: 'Brown leather backpack', description: 'Dark brown leather backpack, Zara brand. Contains notebooks and a blue pencil case.', location: 'Faculty office', date: '2026-06-15', reporterName: 'Ada L.', contact: '+234 701 987 6543', createdAt: '2026-06-15 09:20', status: 'active' },
+  { id: 4, type: 'found', category: 'documents', name: 'LASU Student ID Card', description: 'Found a LASU ID card near the Engineering Block. Name on card is partially visible.', location: 'Engineering Block', date: '2026-06-16', reporterName: 'Bayo O.', contact: '+234 802 555 1111', createdAt: '2026-06-16 12:45', status: 'active' },
+  { id: 5, type: 'lost', category: 'electronics', name: 'HP Laptop Charger', description: '65W HP laptop charger, black, left in ICT Centre computer lab after evening session.', location: 'ICT Centre', date: '2026-06-16', time: '19:00', reporterName: 'Kunle T.', contact: '+234 808 777 2222', createdAt: '2026-06-16 19:15', status: 'active' },
 ];
 
 const SEED_NOTICES = [
-  { id: 1, title: 'Lost & Found desk location changed', message: 'The Lost & Found desk has moved to the ground floor of the Administration Block. Operating hours: Mon–Fri, 8 AM – 4 PM.', audience: 'all', createdAt: '2026-06-10 08:00', priority: 'high' },
-  { id: 2, title: 'Unclaimed items list — June 2026', message: 'Several items submitted in May remain unclaimed. Please visit the Lost & Found desk before June 30 to claim them, or they will be donated.', audience: 'all', createdAt: '2026-06-12 10:00', priority: 'normal' },
+  { id: 1, title: 'Lost & Found desk location changed', message: 'The Lost & Found desk has moved to the ground floor of the Administration Block. Operating hours: Mon–Fri, 8 AM – 4 PM.', audience: 'all', priority: 'high', createdAt: '2026-06-10 08:00' },
+  { id: 2, title: 'Unclaimed items list — June 2026', message: 'Several items submitted in May remain unclaimed. Please visit the Lost & Found desk before June 30 to claim them, or they will be disposed.', audience: 'all', priority: 'normal', createdAt: '2026-06-12 10:30' },
 ];
 
 let state = { items: [], notices: [] };
@@ -511,15 +568,137 @@ function updateStats() {
   const items = state.items;
   const lost = items.filter(i => i.type === 'lost' && i.status === 'active').length;
   const found = items.filter(i => i.type === 'found' && i.status === 'active').length;
-  const claims = items.filter(i => i.claimRequest && i.status === 'active').length;
-  const resolved = items.filter(i => i.status === 'resolved' || i.status === 'claimed').length;
+  const leads = items.filter(i => i.finderLeads && i.finderLeads.some(l => l.status === 'pending')).length;
+  const verified = items.filter(i => i.finderLeads && i.finderLeads.some(l => l.status === 'verified')).length;
   document.getElementById('d-lost').textContent = lost;
   document.getElementById('d-found').textContent = found;
-  document.getElementById('d-claims').textContent = claims;
-  document.getElementById('d-resolved').textContent = resolved;
+  document.getElementById('d-leads').textContent = leads;
+  document.getElementById('d-verified').textContent = verified;
   document.getElementById('badge-lost').textContent = lost;
   document.getElementById('badge-found').textContent = found;
-  document.getElementById('badge-claims').textContent = claims;
+  document.getElementById('badge-leads').textContent = leads;
+}
+
+// ===================== FINDER LEADS =====================
+function renderFinderLeads() {
+  const leadsItems = state.items.filter(i => i.finderLeads && i.finderLeads.length > 0);
+  const el = document.getElementById('leads-container');
+  
+  if (!leadsItems.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📣</div><div class="empty-title">No finder leads yet</div><div class="empty-desc">When finders submit "I found it" for lost items, they will appear here</div></div>`;
+    return;
+  }
+
+  let html = '';
+  leadsItems.forEach(item => {
+    if (!item.finderLeads || !item.finderLeads.length) return;
+    
+    const cat = getCat(item.category);
+    const leadsHtml = item.finderLeads.map((lead, idx) => `
+      <div class="lead-item">
+        <div class="lead-item-header">
+          <div class="lead-item-name">👤 ${lead.finderName}</div>
+          <span class="lead-item-badge" style="background:${lead.status === 'verified' ? 'var(--green-light)' : 'var(--amber-light)'}; color:${lead.status === 'verified' ? '#059669' : 'var(--amber-dark)'};">${lead.status.toUpperCase()}</span>
+        </div>
+        <div class="lead-item-detail">📞 Contact: <strong>${lead.finderContact}</strong></div>
+        <div class="lead-item-detail">📍 Location: ${lead.finderLocation}</div>
+        <div class="lead-item-detail">💬 Message: ${lead.finderMessage}</div>
+        <div class="lead-item-detail">📅 Submitted: ${lead.submittedAt || 'N/A'}</div>
+        ${lead.status === 'verified' ? `<div class="lead-item-detail" style="color:var(--green); font-weight:600;">✓ Verified on ${lead.verifiedAt}</div>` : ''}
+        <div class="lead-item-actions">
+          ${lead.status === 'pending' ? `
+            <button class="btn btn-green" onclick="verifyLead(${item.id}, ${idx})">✔ Mark Verified</button>
+            <button class="btn btn-amber" onclick="forwardLeadToOwner(${item.id}, ${idx})">📨 Forward to Owner</button>
+            <button class="btn btn-red" onclick="rejectLead(${item.id}, ${idx})">✕ Reject</button>
+          ` : ''}
+          ${lead.status === 'verified' ? `
+            <button class="btn btn-amber" onclick="forwardLeadToOwner(${item.id}, ${idx})">📨 Forward to Owner</button>
+            <button class="btn btn-ghost" onclick="revokeLead(${item.id}, ${idx})">Revoke</button>
+          ` : ''}
+          ${lead.status === 'forwarded' ? `
+            <span style="font-size:0.75rem;color:var(--slate);">✓ Forwarded on ${lead.forwardedAt}</span>
+          ` : ''}
+        </div>
+      </div>
+    `).join('');
+
+    html += `
+      <div class="leads-group">
+        <div class="leads-group-header">
+          ${cat.emoji} <strong>${item.name}</strong>
+          <span style="font-size:0.7rem;color:var(--slate);">#${item.id_pub || item.id}</span>
+        </div>
+        <div class="leads-items">
+          ${leadsHtml}
+        </div>
+      </div>
+    `;
+  });
+
+  el.innerHTML = html;
+}
+
+function verifyLead(itemId, leadIdx) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item || !item.finderLeads || !item.finderLeads[leadIdx]) return;
+  const lead = item.finderLeads[leadIdx];
+  item.finderLeads[leadIdx].status = 'verified';
+  item.finderLeads[leadIdx].verifiedAt = new Date().toISOString().slice(0,16).replace('T', ' ');
+  // Reveal owner contact in admin panel
+  item.finderLeads[leadIdx].ownerContactRevealed = true;
+  saveState();
+  updateStats();
+  toast(`Lead from ${lead.finderName} marked as verified! Owner contact is now visible.`);
+  renderFinderLeads();
+}
+
+function forwardLeadToOwner(itemId, leadIdx) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item || !item.finderLeads || !item.finderLeads[leadIdx]) return;
+  const lead = item.finderLeads[leadIdx];
+  
+  // Change item status to Claimed
+  const oldStatus = item.status;
+  item.status = 'claimed';
+  
+  // Update admin response with finder match notification
+  const notification = `✓ FINDER MATCH: A verified finder has reported having this item.\n\nFinder: ${lead.finderName}\nContact: ${lead.finderContact}\nLocation: ${lead.finderLocation}\nMessage: ${lead.finderMessage}\n\nThis item has been marked as claimed and the finder has been notified.`;
+  item.adminResponse = (item.adminResponse ? item.adminResponse + '\n\n---\n\n' : '') + notification;
+  
+  // Mark lead as forwarded
+  item.finderLeads[leadIdx].status = 'forwarded';
+  item.finderLeads[leadIdx].forwardedAt = new Date().toISOString().slice(0,16).replace('T', ' ');
+  
+  saveState();
+  updateStats();
+  toast(`Lead forwarded to owner! Item status changed to Claimed.`);
+  renderFinderLeads();
+  renderQueue('lost');
+  renderQueue('found');
+}
+
+function rejectLead(itemId, leadIdx) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item || !item.finderLeads || !item.finderLeads[leadIdx]) return;
+  if (!confirm('Reject this finder lead? The finder will not be notified.')) return;
+  const lead = item.finderLeads[leadIdx];
+  item.finderLeads.splice(leadIdx, 1);
+  saveState();
+  updateStats();
+  toast(`Lead from ${lead.finderName} rejected.`);
+  renderFinderLeads();
+}
+
+function revokeLead(itemId, leadIdx) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item || !item.finderLeads || !item.finderLeads[leadIdx]) return;
+  if (!confirm('Revoke this verified lead?')) return;
+  item.finderLeads[leadIdx].status = 'pending';
+  item.finderLeads[leadIdx].verifiedAt = null;
+  saveState();
+  updateStats();
+  toast('Lead revoked back to pending.');
+  renderFinderLeads();
 }
 
 // ===================== QUEUE ITEM HTML =====================
@@ -559,6 +738,21 @@ function queueItemHtml(item, opts = {}) {
       `).join('')}
     </div>` : '';
 
+  // Finder leads card
+  const finderLeadsCard = (item.finderLeads && item.finderLeads.length) ? `
+    <div class="finder-lead-card">
+      <div class="finder-lead-card-title">📣 Finder Leads (${item.finderLeads.length})</div>
+      ${item.finderLeads.map((lead, idx) => `
+        <div style="margin-bottom:0.4rem;padding-bottom:0.4rem;border-bottom:1px solid rgba(30,64,175,0.2);">
+          <div class="finder-lead-card-field"><strong>${lead.finderName}</strong> <span style="font-size:0.65rem;font-weight:600;padding:0.1rem 0.3rem;background:${lead.status === 'verified' ? 'var(--green-light)' : 'var(--amber-light)'}; color:${lead.status === 'verified' ? '#059669' : 'var(--amber-dark)'};border-radius:4px;">${lead.status}</span></div>
+          <div class="finder-lead-card-field">📞 Contact: <span>${lead.finderContact}</span></div>
+          <div class="finder-lead-card-field">📍 Location: <span>${lead.finderLocation}</span></div>
+          <div class="finder-lead-card-field">💬 <span>${lead.finderMessage}</span></div>
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
   const responseArea = opts.showResponse !== false ? `
     <div class="response-area">
       <div class="resp-label">Admin Response</div>
@@ -596,6 +790,7 @@ function queueItemHtml(item, opts = {}) {
           <span>🕐 Submitted ${item.createdAt}</span>
         </div>
         ${tagsHtml ? `<div class="queue-tags">${tagsHtml}</div>` : ''}
+        ${finderLeadsCard}
         ${claimCard}
         ${contactRequests}
         ${existingResp}
@@ -611,7 +806,7 @@ function renderDashRecent() {
   if (search) items = items.filter(i => i.name.toLowerCase().includes(search) || i.reporterName.toLowerCase().includes(search));
   const el = document.getElementById('dash-recent');
   if (!items.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No reports yet</div><div class="empty-desc">Reports submitted from the public board will appear here.</div></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No reports yet</div><div class="empty-desc">Reports submitted from the public board will appear here</div></div>`;
     return;
   }
   el.innerHTML = items.map(i => queueItemHtml(i)).join('');
@@ -628,7 +823,7 @@ function renderQueue(type) {
   items.sort((a,b) => b.id - a.id);
   const el = document.getElementById(`queue-${type}`);
   if (!items.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">${type === 'lost' ? '🔴' : '🟢'}</div><div class="empty-title">No ${type} items${search ? ' matching your search' : ''}</div></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">${type === 'lost' ? '🔴' : '🟢'}</div><div class="empty-title">No ${type} items${search ? ' matching your search' : ''}</div><div class="empty-desc">Lost & found reports will appear here</div></div>`;
     return;
   }
   el.innerHTML = items.map(i => queueItemHtml(i)).join('');
@@ -638,7 +833,7 @@ function renderClaims() {
   const items = state.items.filter(i => i.claimRequest);
   const el = document.getElementById('queue-claims');
   if (!items.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🙋</div><div class="empty-title">No claim requests yet</div><div class="empty-desc">When a user submits a claim on a found item, it will appear here.</div></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🙋</div><div class="empty-title">No claim requests yet</div><div class="empty-desc">When a user submits a claim on a found item, it will appear here</div></div>`;
     return;
   }
   el.innerHTML = items.map(i => queueItemHtml(i)).join('');
@@ -741,7 +936,6 @@ function approveClaim(id) {
   item.status = 'claimed';
   item.adminResponse = item.adminResponse || `Claim approved for ${item.claimRequest.name} by admin.`;
   item.claimedAt = new Date().toISOString().slice(0,16).replace('T', ' ');
-  // Keep claimRequest for record but mark it as handled
   item.claimRequest.adminHandledAt = item.claimedAt;
   item.claimRequest.adminHandledBy = 'admin';
   saveState();
@@ -765,7 +959,7 @@ function interviewContact(itemId, reqIndex) {
   const item = state.items.find(i => i.id === itemId);
   if (!item || !item.contactAdminRequests || !item.contactAdminRequests[reqIndex]) return;
   const notes = prompt('Enter brief interview notes / follow-up instructions for this finder:');
-  if (notes === null) return; // cancelled
+  if (notes === null) return;
   item.contactAdminRequests[reqIndex].interviewNotes = notes.trim();
   item.contactAdminRequests[reqIndex].interviewedAt = new Date().toISOString().slice(0,16).replace('T',' ');
   saveState();
@@ -776,7 +970,6 @@ function interviewContact(itemId, reqIndex) {
 function notifyOwner(itemId, reqIndex) {
   const item = state.items.find(i => i.id === itemId);
   if (!item || !item.contactAdminRequests || !item.contactAdminRequests[reqIndex]) return;
-  // Admin chooses which lost report (owner) to notify by entering the lost item id
   const lostId = prompt('Enter the ID (numeric) of the lost report to notify (e.g. 1):');
   if (!lostId) return;
   const lid = parseInt(lostId, 10);
@@ -785,7 +978,6 @@ function notifyOwner(itemId, reqIndex) {
   const cr = item.contactAdminRequests[reqIndex];
   const note = `Admin note: A finder (${cr.name} · ${cr.contact}) reports they have this item. Message: ${cr.message}. Please contact the finder to arrange return.`;
   lostItem.adminResponse = (lostItem.adminResponse ? lostItem.adminResponse + '\n\n' : '') + note;
-  // mark the found item as pending admin action (optional)
   item.adminResponse = (item.adminResponse ? item.adminResponse + '\n\n' : '') + `Notified owner (ref #${lostItem.id_pub || lostItem.id}) by admin.`;
   saveState();
   updateStats();
@@ -805,6 +997,7 @@ function populateCatFilters() {
 // ===================== VIEW SWITCHING =====================
 const VIEW_TITLES = {
   'dashboard': ['Dashboard', 'Overview of all Lost & Found activity'],
+  'finder-leads': ['Finder Leads', 'Review and manage finder submissions for lost items'],
   'lost-queue': ['Lost Items Queue', 'Review and respond to lost item reports'],
   'found-queue': ['Found Items Queue', 'Review turned-in items and process claims'],
   'claims': ['Claim Requests', 'Review ownership claims submitted by users'],
@@ -818,6 +1011,7 @@ function setView(view) {
   const [title, sub] = VIEW_TITLES[view] || [view, ''];
   document.getElementById('topbar-title').textContent = title;
   document.getElementById('topbar-sub').textContent = sub;
+  if (view === 'finder-leads') renderFinderLeads();
   if (view === 'lost-queue') renderQueue('lost');
   if (view === 'found-queue') renderQueue('found');
   if (view === 'claims') renderClaims();
@@ -835,6 +1029,7 @@ function refresh() {
 function renderAll() {
   updateStats();
   renderDashRecent();
+  renderFinderLeads();
   renderQueue('lost');
   renderQueue('found');
   renderClaims();
@@ -847,7 +1042,7 @@ loadState();
 populateCatFilters();
 renderAll();
 
-// Listen for storage changes from other tabs (e.g. public board submits a claim)
+// Listen for storage changes from other tabs
 window.addEventListener('storage', (e) => {
   try {
     if (e.key === STORAGE_KEY) {
@@ -856,10 +1051,13 @@ window.addEventListener('storage', (e) => {
       const prevItems = Array.isArray(prev.items) ? prev.items : [];
       const nextItems = Array.isArray(next.items) ? next.items : [];
       const addedClaims = nextItems.filter(ni => ni.claimRequest && !prevItems.some(pi => pi.id === ni.id && pi.claimRequest));
+      const addedLeads = nextItems.filter(ni => ni.finderLeads && ni.finderLeads.length > 0 && !(prevItems.find(pi => pi.id === ni.id) || {}).finderLeads?.length);
       if (addedClaims.length) {
         addedClaims.forEach(it => toast(`New claim submitted for ${it.id_pub || '#'+it.id}`));
       }
-      // reload state and re-render to keep admin view in sync
+      if (addedLeads.length) {
+        addedLeads.forEach(it => toast(`New finder lead for ${it.id_pub || '#'+it.id}`));
+      }
       loadState();
       renderAll();
     }
